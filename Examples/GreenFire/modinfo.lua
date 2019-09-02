@@ -1,11 +1,5 @@
 local modinfo = {
-    modname = "Green Fire",
-    libraries = {
-        "lib/MoreSmokeMod",
-    },
-    shaders = {
-        "shaders/fireParticle.frag.spv",
-    },
+    name = "Green Fire",
 }
 
 return modinfo
