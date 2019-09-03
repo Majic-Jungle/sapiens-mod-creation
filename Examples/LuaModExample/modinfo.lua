@@ -1,5 +1,5 @@
 local modinfo = {
-    name = "Green Fire",
+    name = "Lua Mod Example",
 }
 
 return modinfo
