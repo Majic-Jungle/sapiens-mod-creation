@@ -51,7 +51,7 @@ typedef struct SPParticleState {
 
 typedef struct SPParticleThreadState {
 	void* particleManager;
-	void (*addParticle)(void*,void*,uint32_t,SPParticleState*);
+	void (*addParticle)(void*,SPParticleEmitterState*,uint32_t,SPParticleState*);
 	SPRand* spRand;
 	SPNoise* spNoise;
 } SPParticleThreadState;

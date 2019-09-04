@@ -5,20 +5,22 @@
 //define local identifiers for this mod to use, it will be given back as the localTypeID in update functions, and used by the engine to determine particle type when adding particles
 
 enum {
-	sp_vanillaEmitterTypeCampfire = 1,
+	sp_vanillaEmitterTypeCampfire = 0,
 	sp_vanillaEmitterTypeWoodChop,
 	sp_vanillaEmitterTypeFeathers
 };
 
 enum {
-	sp_vanillaRenderGroupSmoke = 1,
+	sp_vanillaRenderGroupSmoke = 0,
 	sp_vanillaRenderGroupFire,
 	sp_vanillaRenderGroupStandard,
 	sp_vanillaRenderGroupSpark,
 };
 
 
-//define emitter types that we wish to override or add
+//define emitter types that we wish to override or add. Vanilla functions and functions for mods with earlier order indexes than this one that override the same type, will not get called.
+//Mods with later order indexes than this mod will win, so it's possible that even though you define behavior in the functions here, those functions may not actually get called..
+
 #define EMITTER_TYPES_COUNT 3
 static SPParticleEmitterTypeInfo particleEmitterTypeInfos[EMITTER_TYPES_COUNT] = {
 	{
@@ -43,7 +45,7 @@ static int vertexDescriptionTypes[VERTEX_ATTRIBUTE_COUNT] = {
 	SPRenderGroupVertexDescriptionType_vec4
 };
 
-//define render groups that we wish to use, override or add. To use an existing/predefined render group, set vertexDescriptionTypeCount to 0
+//define render groups that we wish to use, override or add. To use an existing/predefined render group, either define again or set vertexDescriptionTypeCount to 0
 #define RENDER_GROUP_TYPES_COUNT 4
 static SPParticleRenderGroupInfo renderGroupInfos[RENDER_GROUP_TYPES_COUNT] = {
 	{
