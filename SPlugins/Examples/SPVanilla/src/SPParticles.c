@@ -2,36 +2,114 @@
 
 #include "SPParticles.h"
 
+//define local identifiers for this mod to use, it will be given back as the localTypeID in update functions, and used by the engine to determine particle type when adding particles
+
 enum {
-	sp_emitterTypeCampfire = 1,
-	sp_emitterTypeWoodChop,
-	sp_emitterTypeFeathers
+	sp_vanillaEmitterTypeCampfire = 1,
+	sp_vanillaEmitterTypeWoodChop,
+	sp_vanillaEmitterTypeFeathers
 };
 
 enum {
-	sp_particleRenderTypeSmoke = 1,
-	sp_particleRenderTypeFire,
-	sp_particleRenderTypeStandard,
-	sp_particleRenderTypeSpark,
+	sp_vanillaRenderGroupSmoke = 1,
+	sp_vanillaRenderGroupFire,
+	sp_vanillaRenderGroupStandard,
+	sp_vanillaRenderGroupSpark,
 };
 
+
+//define emitter types that we wish to override or add
+#define EMITTER_TYPES_COUNT 3
+static SPParticleEmitterTypeInfo particleEmitterTypeInfos[EMITTER_TYPES_COUNT] = {
+	{
+		"campfire",
+		sp_vanillaEmitterTypeCampfire
+	},
+	{
+		"woodChop",
+		sp_vanillaEmitterTypeWoodChop
+	},
+	{
+		"feathers",
+		sp_vanillaEmitterTypeFeathers
+	}
+};
+
+//define the vertex attributes that the shader will use. In the vanilla mod, all currently take the same, but this could be different for more complex shaders
+#define VERTEX_ATTRIBUTE_COUNT 3
+static int vertexDescriptionTypes[VERTEX_ATTRIBUTE_COUNT] = {
+	SPRenderGroupVertexDescriptionType_vec3, 
+	SPRenderGroupVertexDescriptionType_vec2,
+	SPRenderGroupVertexDescriptionType_vec4
+};
+
+//define render groups that we wish to use, override or add. To use an existing/predefined render group, set vertexDescriptionTypeCount to 0
+#define RENDER_GROUP_TYPES_COUNT 4
+static SPParticleRenderGroupInfo renderGroupInfos[RENDER_GROUP_TYPES_COUNT] = {
+	{
+		"smokeParticle",
+		sp_vanillaRenderGroupSmoke,
+		VERTEX_ATTRIBUTE_COUNT,
+		vertexDescriptionTypes
+	},
+	{
+		"fireParticle",
+		sp_vanillaRenderGroupFire,
+		VERTEX_ATTRIBUTE_COUNT,
+		vertexDescriptionTypes
+	},
+	{
+		"particle",
+		sp_vanillaRenderGroupStandard,
+		VERTEX_ATTRIBUTE_COUNT,
+		vertexDescriptionTypes
+	},
+	{ 
+		"spark",
+		sp_vanillaRenderGroupSpark,
+		VERTEX_ATTRIBUTE_COUNT,
+		vertexDescriptionTypes
+	}
+};
+
+int spGetEmitterTypesCount()
+{
+	return EMITTER_TYPES_COUNT;
+}
+
+SPParticleEmitterTypeInfo* spGetEmitterTypes()
+{
+	return particleEmitterTypeInfos;
+}
+
+
+int spGetRenderGroupTypesCount()
+{
+	return RENDER_GROUP_TYPES_COUNT;
+}
+
+SPParticleRenderGroupInfo* spGetRenderGroupTypes()
+{
+	return renderGroupInfos;
+}
 
 bool spEmitterWasAdded(SPParticleThreadState* threadState,
-	SPParticleEmitterState* emitterState)
+	SPParticleEmitterState* emitterState,
+	uint32_t localEmitterTypeID)
 {
 	bool removeImmediately = false;
 	SPRand* spRand = threadState->spRand;
 
 
-	switch(emitterState->type)
+	switch(localEmitterTypeID)
 	{
-	case sp_emitterTypeCampfire:
+	case sp_vanillaEmitterTypeCampfire:
 	{
 	
 	}
 
 		break;
-	case sp_emitterTypeWoodChop:
+	case sp_vanillaEmitterTypeWoodChop:
 	{
 		removeImmediately = true;
 		double posLength = spVec3Length(emitterState->p);
@@ -52,12 +130,13 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 			state.gravity = gravity;
 
 			/*(*addParticle)(particleManager,
+		emitterState,
 				sp_particleRenderTypeStandard,
 				&state);*/
 		}
 	}
 		break;
-	case sp_emitterTypeFeathers:
+	case sp_vanillaEmitterTypeFeathers:
 	{
 		removeImmediately = true;
 		double posLength = spVec3Length(emitterState->p);
@@ -77,6 +156,7 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 			state.gravity = gravity;
 
 			/*(*addParticle)(particleManager,
+		emitterState,
 				sp_particleRenderTypeStandard,
 				&state);*/
 		}
@@ -118,7 +198,8 @@ void emitFireParticle(SPParticleThreadState* threadState,
 	state.randomValueB = spRandGetValue(spRand);
 
 	(*threadState->addParticle)(threadState->particleManager,
-		sp_particleRenderTypeFire,
+		emitterState,
+		sp_vanillaRenderGroupFire,
 		&state);
 }
 
@@ -126,6 +207,7 @@ static const double fixedTimeStep = 1.0/60.0;
 
 void spUpdateEmitter(SPParticleThreadState* threadState,
 	SPParticleEmitterState* emitterState,
+	uint32_t localEmitterTypeID,
 	double dt)
 {
 	SPRand* spRand = threadState->spRand;
@@ -136,9 +218,9 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 	{
 		emitterState->timeAccumulatorA -= fixedTimeStep;
 		emitterState->timeAccumulatorB += fixedTimeStep;
-		switch(emitterState->type)
+		switch(localEmitterTypeID)
 		{
-		case sp_emitterTypeCampfire:
+		case sp_vanillaEmitterTypeCampfire:
 		{
 			if(emitterState->counters[0] == 0) // SMOKE
 			{
@@ -167,7 +249,8 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 				state.gravity = spVec3Add(state.gravity, spVec3Mul(spMat3GetRow(emitterState->rot, 2), SP_METERS_TO_PRERENDER(noiseValueB) * 0.5));
 
 				(*threadState->addParticle)(threadState->particleManager,
-					sp_particleRenderTypeSmoke,
+					emitterState,
+					sp_vanillaRenderGroupSmoke,
 					&state);
 
 				emitterState->counters[0] = 1 + (uint8_t)(20 * (1.0 - noiseValueC));
@@ -250,7 +333,8 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 					state.gravity = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(1.0));
 
 					(*threadState->addParticle)(threadState->particleManager,
-						sp_particleRenderTypeSpark,
+						emitterState,
+						sp_vanillaRenderGroupSpark,
 						&state);
 				}
 				emitterState->counters[3]--;
@@ -272,22 +356,22 @@ static const SPVec2 texCoords[4] = {
 
 bool spUpdateParticle(SPParticleThreadState* threadState, 
 	SPParticleState* particleState, 
-	uint32_t renderGroup,
+	uint32_t localRenderGroupTypeID,
 	double dt, 
 	SPVec3 origin, 
 	float* renderBuffer)
 {
 	double lifeLeftMultiplier = 1.0;
 
-	if(renderGroup == sp_particleRenderTypeSmoke)
+	if(localRenderGroupTypeID == sp_vanillaRenderGroupSmoke)
 	{
 		lifeLeftMultiplier = 0.05;
 	}
-	else if(renderGroup == sp_particleRenderTypeFire)
+	else if(localRenderGroupTypeID == sp_vanillaRenderGroupFire)
 	{
 		lifeLeftMultiplier = (1.5 - particleState->randomValueB * 0.5);
 	}
-	else if(renderGroup == sp_particleRenderTypeSpark)
+	else if(localRenderGroupTypeID == sp_vanillaRenderGroupSpark)
 	{
 		lifeLeftMultiplier = (1.5 - particleState->randomValueB * 1.0);
 	}
@@ -301,12 +385,12 @@ bool spUpdateParticle(SPParticleThreadState* threadState,
 		return false;
 	}
 
-	if(renderGroup == sp_particleRenderTypeFire)
+	if(localRenderGroupTypeID == sp_vanillaRenderGroupFire)
 	{
 
 		particleState->p = spVec3Add(particleState->p, spVec3Mul(particleState->v, (2.0 - lifeLeft) * dt));
 	}
-	else if(renderGroup == sp_particleRenderTypeSmoke)
+	else if(localRenderGroupTypeID == sp_vanillaRenderGroupSmoke)
 	{
 		particleState->v = spVec3Mul(particleState->v, 1.0 - dt * 0.05);
 

@@ -1,5 +1,5 @@
 local modinfo = {
-    name = "C Mod Example",
+    name = "Terrain Example",
     version = "0.0.1",
     type = "world",
     cmods = {
@@ -10,4 +10,4 @@ local modinfo = {
     }
 }
 
-return modinfo
+return modinfo 
