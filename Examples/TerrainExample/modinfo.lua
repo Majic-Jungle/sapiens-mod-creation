@@ -1,4 +1,4 @@
-local modinfo = {
+local modInfo = {
     name = "Terrain Example",
     version = "0.0.1",
     type = "world",
@@ -10,4 +10,4 @@ local modinfo = {
     }
 }
 
-return modinfo 
+return modInfo 
