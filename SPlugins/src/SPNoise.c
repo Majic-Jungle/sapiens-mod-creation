@@ -5,6 +5,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+
+#define RANDOM_N 624
+typedef struct SPNoise {
+	int* p;
+	double* g3;
+	double persistance;
+
+	unsigned long state[RANDOM_N];
+	int left;
+	unsigned long *next;
+} SPNoise;
+
 /* Period parameters */  
 #define RANDOM_M 397
 #define MATRIX_A 0x9908b0dfUL   /* constant vector a */

@@ -4,6 +4,12 @@
 #include "SPCommon.h"
 #include <stdlib.h>
 
+
+typedef struct SPRand {
+	uint32_t seed;
+	uint32_t counter;
+} SPRand;
+
 // MurmurHash3_x86_32 is public domain taken from MurmurHash3  written by Austin Appleby, https://github.com/aappleby/smhasher/wiki/MurmurHash3
 
 #if defined(_MSC_VER)

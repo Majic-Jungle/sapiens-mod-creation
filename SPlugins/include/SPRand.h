@@ -5,10 +5,7 @@
 #include "SPCommon.h"
 #include "SPMath.h"
 
-typedef struct SPRand {
-	uint32_t seed;
-	uint32_t counter;
-} SPRand;
+typedef struct SPRand SPRand;
 
 MJ_EXPORT SPRand* spRandNew(uint32_t seed);
 MJ_EXPORT void spRandDelete(SPRand* spRand);
