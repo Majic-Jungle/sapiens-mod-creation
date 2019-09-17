@@ -131,10 +131,10 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 			state.randomValueA = spRandGetValue(spRand);
 			state.gravity = gravity;
 
-			/*(*addParticle)(particleManager,
-		emitterState,
-				sp_particleRenderTypeStandard,
-				&state);*/
+			(*threadState->addParticle)(threadState->particleManager,
+				emitterState,
+				sp_vanillaRenderGroupStandard,
+				&state);
 		}
 	}
 		break;
@@ -157,10 +157,10 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 			state.randomValueA = spRandGetValue(spRand);
 			state.gravity = gravity;
 
-			/*(*addParticle)(particleManager,
+			(*threadState->addParticle)(threadState->particleManager,
 		emitterState,
-				sp_particleRenderTypeStandard,
-				&state);*/
+				sp_vanillaRenderGroupStandard,
+				&state);
 		}
 	}
 
@@ -236,8 +236,6 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 				state.lifeLeft = 1.0;
 				state.scale = 0.2 + spRandGetValue(spRand) * 0.2;
 				state.randomValueA = spRandGetValue(spRand);
-				//state.gravity = spVec3Mul(spMat3GetRow(emitterState->rot, 0), SP_METERS_TO_PRERENDER(-0.1 + 0.2 * spRandGetValue(spRand)));
-				//state.gravity = spVec3Add(state.gravity, spVec3Mul(spMat3GetRow(emitterState->rot, 2), SP_METERS_TO_PRERENDER(-0.1 + 0.2 * spRandGetValue(spRand))));
 				SPVec3 lookup = {(normalizedPos.x + 1.2) * 99999.9, (normalizedPos.y * 4.5 + normalizedPos.z + 2.4) * 99999.9, emitterState->timeAccumulatorB * 0.1};
 				SPVec3 lookupB = {(normalizedPos.x + 1.4) * 99999.9, (normalizedPos.y * 4.6 + normalizedPos.z + 2.8) * 99999.9, emitterState->timeAccumulatorB * 0.1};
 				SPVec3 lookupC = {(normalizedPos.x + 1.8) * 99999.9, (normalizedPos.y * 4.8 + normalizedPos.z + 2.9) * 99999.9, emitterState->timeAccumulatorB * 0.5};

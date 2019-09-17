@@ -57,31 +57,15 @@ typedef struct SPParticleThreadState {
 } SPParticleThreadState;
 
 typedef int (* SPGetEmitterTypesCountFunc) ();
-MJ_EXPORT int spGetEmitterTypesCount();
-
 typedef SPParticleEmitterTypeInfo* (* SPGetEmitterTypesFunc) ();
-MJ_EXPORT SPParticleEmitterTypeInfo* spGetEmitterTypes();
-
 typedef int (* SPGetRenderGroupTypesCountFunc) ();
-MJ_EXPORT int spGetRenderGroupTypesCount();
-
 typedef SPParticleRenderGroupInfo* (* SPGetRenderGroupTypesFunc) ();
-MJ_EXPORT SPParticleRenderGroupInfo* spGetRenderGroupTypes();
 
 typedef bool (* SPEmitterWasAddedFunc) (SPParticleThreadState* threadState,
 	SPParticleEmitterState* emitterState,
 	uint32_t localEmitterTypeID);
 
-MJ_EXPORT bool spEmitterWasAdded(SPParticleThreadState* threadState,
-	SPParticleEmitterState* emitterState,
-	uint32_t localEmitterTypeID);
-
 typedef void (* SPUpdateEmitterFunc) (SPParticleThreadState* threadState,
-	SPParticleEmitterState* emitterState,
-	uint32_t localEmitterTypeID,
-	double dt);
-
-MJ_EXPORT void spUpdateEmitter(SPParticleThreadState* threadState,
 	SPParticleEmitterState* emitterState,
 	uint32_t localEmitterTypeID,
 	double dt);
@@ -92,6 +76,21 @@ typedef bool (* SPUpdateParticleFunc) (SPParticleThreadState* threadState,
 	double dt, 
 	SPVec3 origin, 
 	float* renderBuffer);
+
+MJ_EXPORT int spGetEmitterTypesCount();
+MJ_EXPORT SPParticleEmitterTypeInfo* spGetEmitterTypes();
+MJ_EXPORT int spGetRenderGroupTypesCount();
+MJ_EXPORT SPParticleRenderGroupInfo* spGetRenderGroupTypes();
+
+MJ_EXPORT bool spEmitterWasAdded(SPParticleThreadState* threadState,
+	SPParticleEmitterState* emitterState,
+	uint32_t localEmitterTypeID);
+
+
+MJ_EXPORT void spUpdateEmitter(SPParticleThreadState* threadState,
+	SPParticleEmitterState* emitterState,
+	uint32_t localEmitterTypeID,
+	double dt);
 
 MJ_EXPORT bool spUpdateParticle(SPParticleThreadState* threadState, 
 	SPParticleState* particleState, 
