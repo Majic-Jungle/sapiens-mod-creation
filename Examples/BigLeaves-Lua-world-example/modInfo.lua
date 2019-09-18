@@ -1,6 +1,6 @@
 local modInfo = {
-    name = "Big Leaves World Lua Mod",
-    description = "A very simple example mod that makes all the leaves bigger.",
+    name = "Big Leaves Example",
+    description = "This example mod uses Lua to make all of the leaves on trees and bushes longer.",
     preview = "preview.jpg",
     version = "0.0.1",
     type = "world",
