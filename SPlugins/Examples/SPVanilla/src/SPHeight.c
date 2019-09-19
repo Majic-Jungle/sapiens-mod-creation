@@ -4,7 +4,14 @@
 
 #define TERRAIN_HEIGHT_MAXISH 0.0008
 
-SPVec4 spHeightGet(SPNoise* noise1, 
+
+bool spReplacesPreviousHeight()
+{
+	return true;
+}
+
+SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns false, then previousHeight is the output of the previous mod, otherwise it should be ignored. 
+	SPNoise* noise1, 
 	SPNoise* noise2,
 	SPVec3 pointNormal, 
 	SPVec3 noiseLoc, 

@@ -5,7 +5,9 @@
 #include "SPCommon.h"
 #include "SPNoise.h"
 
-typedef SPVec4 (* SPHeightGetFunc) (SPNoise* noise1, 
+typedef bool (* SPReplacesPreviousHeightFunc) ();
+typedef SPVec4 (* SPHeightGetFunc) (SPVec4 previousHeight,
+	SPNoise* noise1, 
 	SPNoise* noise2,
 	SPVec3 pointNormal, 
 	SPVec3 noiseLoc, 
@@ -13,7 +15,9 @@ typedef SPVec4 (* SPHeightGetFunc) (SPNoise* noise1,
 	double riverValue,
 	double riverDistance);
 
-MJ_EXPORT SPVec4 spHeightGet(SPNoise* noise1, 
+MJ_EXPORT bool spReplacesPreviousHeight();
+MJ_EXPORT SPVec4 spHeightGet(SPVec4 previousHeight,
+	SPNoise* noise1, 
 	SPNoise* noise2,
 	SPVec3 pointNormal, 
 	SPVec3 noiseLoc, 
