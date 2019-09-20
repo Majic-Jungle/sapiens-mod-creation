@@ -13,18 +13,6 @@ typedef struct SPWorldGenOptions {
 	SPVec3 influences;
 } SPWorldGenOptions;
 
-typedef struct SPBiomeType {
-	int16_t normalTerrainType;
-	int16_t secondaryTerrainType;
-
-	int16_t rockTerrainType;
-	int16_t beachTerrainType;
-
-	int16_t vegetationStrippedTerrainType;
-	int16_t _padding[3];
-
-} SPBiomeType;
-
 
 
 #endif
