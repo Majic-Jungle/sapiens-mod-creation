@@ -20,10 +20,12 @@ static uint16_t biomeTag_temperate;
 static uint16_t biomeTag_coldWinter;
 static uint16_t biomeTag_drySummer;
 static uint16_t biomeTag_dryWinter;
+static uint16_t biomeTag_verySparseForest;
 static uint16_t biomeTag_sparseForest;
 static uint16_t biomeTag_mediumForest;
 static uint16_t biomeTag_denseForest;
-static uint16_t biomeTag_plains;
+static uint16_t biomeTag_coniferous;
+static uint16_t biomeTag_birch;
 
 static uint16_t terrainType_tundraGrass;
 static uint16_t terrainType_rock;
@@ -49,6 +51,9 @@ static uint16_t gameObjectType_appleTree1;
 #define BIRCH_TYPE_COUNT 4
 static uint16_t gameObjectType_birchTypes[BIRCH_TYPE_COUNT];
 
+#define PINE_TYPE_COUNT 3
+static uint16_t gameObjectType_pineTypes[PINE_TYPE_COUNT];
+
 void spBiomeInit(SPBiomeThreadState* threadState)
 {
 	biomeTag_cold = threadState->getBiomeTag(threadState, "cold");
@@ -68,11 +73,12 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 	biomeTag_coldWinter = threadState->getBiomeTag(threadState, "coldWinter");
 	biomeTag_drySummer = threadState->getBiomeTag(threadState, "drySummer");
 	biomeTag_dryWinter = threadState->getBiomeTag(threadState, "dryWinter");
+	biomeTag_verySparseForest = threadState->getBiomeTag(threadState, "verySparseForest");
 	biomeTag_sparseForest = threadState->getBiomeTag(threadState, "sparseForest");
 	biomeTag_mediumForest = threadState->getBiomeTag(threadState, "mediumForest");
 	biomeTag_denseForest = threadState->getBiomeTag(threadState, "denseForest");
-	biomeTag_plains = threadState->getBiomeTag(threadState, "plains");
-
+	biomeTag_coniferous = threadState->getBiomeTag(threadState, "coniferous");
+	biomeTag_birch = threadState->getBiomeTag(threadState, "birch");
 
 	terrainType_tundraGrass = threadState->getTerrainTypeIndex(threadState, "tundraGrass");
 	terrainType_rock = threadState->getTerrainTypeIndex(threadState, "rock");
@@ -102,6 +108,10 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 		gameObjectType_birchTypes[1] = threadState->getGameObjectTypeIndex(threadState, "birch2");
 		gameObjectType_birchTypes[2] = threadState->getGameObjectTypeIndex(threadState, "birch3");
 		gameObjectType_birchTypes[3] = threadState->getGameObjectTypeIndex(threadState, "birch4");
+
+		gameObjectType_pineTypes[0] = threadState->getGameObjectTypeIndex(threadState, "pine1");
+		gameObjectType_pineTypes[1] = threadState->getGameObjectTypeIndex(threadState, "pine2");
+		gameObjectType_pineTypes[2] = threadState->getGameObjectTypeIndex(threadState, "pine3");
 	}
 }
 
@@ -187,6 +197,21 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 			{
 				tagsOut[tagCount++] = biomeTag_polar;
 				tagsOut[tagCount++] = biomeTag_tundra;
+
+				SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 2000.0);
+				double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
+				if(noiseValue > 0.0)
+				{
+					if(noiseValue > 0.3)
+					{
+						tagsOut[tagCount++] = biomeTag_sparseForest;
+					}
+					else
+					{
+						tagsOut[tagCount++] = biomeTag_verySparseForest;
+					}
+					tagsOut[tagCount++] = biomeTag_coniferous;
+				}
 			}
 			else // C or D
 			{
@@ -211,13 +236,29 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 				}
 				else
 				{
-					tagsOut[tagCount++] = biomeTag_plains;
+					tagsOut[tagCount++] = biomeTag_verySparseForest;
 				}
 
 				if (temperatureWinter < -5.0f)
 				{
 					tagsOut[tagCount++] = biomeTag_coldWinter;
 				}
+
+				SPVec3 scaledNoiseLocB = spVec3Mul(noiseLoc, 5501.0);
+				double noiseValueB = spNoiseGet(threadState->spNoise1, scaledNoiseLocB, 4);
+				if(temperatureSummer > noiseValueB * 2.0 + 10.0f)
+				{
+					tagsOut[tagCount++] = biomeTag_birch;
+					if(temperatureWinter < noiseValueB * 5.0 - 5.0f)
+					{
+						tagsOut[tagCount++] = biomeTag_coniferous;
+					}
+				}
+				else
+				{
+					tagsOut[tagCount++] = biomeTag_coniferous;
+				}
+
 
 				if (rainfallSummer < 30.0f && rainfallSummer < rainfallWinter / 3.0f)
 				{
@@ -387,10 +428,10 @@ uint16_t spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState,
 			}
 			for(int j = 0; j < tagCount; j++)
 			{
-				if(tags[j] == biomeTag_coldWinter)
+				/*if(tags[j] == biomeTag_coldWinter)
 				{
 					return terrainType_taigaGrass;
-				}
+				}*/
 				if(tags[j] == biomeTag_drySummer)
 				{
 					return terrainType_mediterraneanGrass;
@@ -462,49 +503,103 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 						}
 
 						int forestDensity = 0;
+						bool coniferous = false;
+						bool birch = false;
 						for(int i = 0; i < tagCount; i++)
 						{
 							if(biomeTags[i] == biomeTag_denseForest)
 							{
-								forestDensity = 3;
-								break;
+								forestDensity = 4;
 							}
 							else if(biomeTags[i] == biomeTag_mediumForest)
 							{
-								forestDensity = 2;
-								break;
+								forestDensity = 3;
 							}
 							else if(biomeTags[i] == biomeTag_sparseForest)
 							{
+								forestDensity = 2;
+							}
+							else if(biomeTags[i] == biomeTag_verySparseForest)
+							{
 								forestDensity = 1;
-								break;
+							}
+
+							if(biomeTags[i] == biomeTag_coniferous)
+							{
+								coniferous = true;
+							}
+							if(biomeTags[i] == biomeTag_birch)
+							{
+								birch = true;
 							}
 						}
 
-						if(forestDensity > 0)
+						int treeCount = 0;
+						if(coniferous || birch)
 						{
-							int treeCount = 0;
 							switch(forestDensity)
 							{
+							case 0:
+								break;
 							case 1:
-								treeCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3254, 8) - 6;
+								treeCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3254, 16) - 14;
 								break;
 							case 2:
-								treeCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3254, 4) + 2;
+								treeCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3254, 8) - 3;
 								break;
 							case 3:
+								treeCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3254, 8) + 1;
+								break;
+							case 4:
 								treeCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3254, 8) + 8;
 								break;
 
 							}
 
-							for(int i = 0; i < treeCount; i++)
+							if(coniferous)
 							{
-								int birchType = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 22245 + i, 4);
-								types[addedCount++] = gameObjectType_birchTypes[birchType];
-								if(addedCount >= BIOME_MAX_GAME_OBJECT_COUNT_PER_SUBDIVISION)
+								if(birch)
 								{
-									return addedCount;
+									for(int i = 0; i < treeCount; i++)
+									{
+										int treeType = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 22245 + i, PINE_TYPE_COUNT + BIRCH_TYPE_COUNT);
+										if(treeType < PINE_TYPE_COUNT)
+										{
+											types[addedCount++] = gameObjectType_pineTypes[treeType];
+										}
+										else
+										{
+											types[addedCount++] = gameObjectType_birchTypes[treeType - PINE_TYPE_COUNT];
+										}
+										if(addedCount >= BIOME_MAX_GAME_OBJECT_COUNT_PER_SUBDIVISION)
+										{
+											return addedCount;
+										}
+									}
+								}
+								else
+								{
+									for(int i = 0; i < treeCount; i++)
+									{
+										int pineType = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 22245 + i, PINE_TYPE_COUNT);
+										types[addedCount++] = gameObjectType_pineTypes[pineType];
+										if(addedCount >= BIOME_MAX_GAME_OBJECT_COUNT_PER_SUBDIVISION)
+										{
+											return addedCount;
+										}
+									}
+								}
+							}
+							else
+							{
+								for(int i = 0; i < treeCount; i++)
+								{
+									int birchType = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 22245 + i, BIRCH_TYPE_COUNT);
+									types[addedCount++] = gameObjectType_birchTypes[birchType];
+									if(addedCount >= BIOME_MAX_GAME_OBJECT_COUNT_PER_SUBDIVISION)
+									{
+										return addedCount;
+									}
 								}
 							}
 						}

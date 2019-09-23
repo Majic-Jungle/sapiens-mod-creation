@@ -30,7 +30,7 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 	SPVec3 pz = spVec3Mul(noiseLoc, 8.0);
 	SPVec3 op = spVec3Mul(offsetPoint, 8.0);
 
-	double lookupOffsetB = spNoiseGet(noise1, spVec3Mul(noiseLoc, 50.2 * scales.y), 1) * 0.001;
+	double lookupOffsetB = spNoiseGet(noise1, spVec3Mul(noiseLoc, 100.2 * scales.y), 1) * 0.005;
 	SPVec3 lookupOffsetVecB = {lookupOffsetB + 1.2,lookupOffsetB + 1.2,lookupOffsetB + 1.2};
 	SPVec3 offsetPointB = spVec3Add(noiseLoc, lookupOffsetVecB);
 	SPVec3 p = spVec3Mul(offsetPointB, 8.0);
@@ -39,15 +39,17 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 	double continents = (riverValue - 0.5) * (2.0 + influences.x * 4.0) + spNoiseGet(noise1, spVec3Mul(op, scales.x * 0.5), 8) * influences.x * 0.3;
 	//continents = fabsf(continents) * continents;
 
-	double mountainTopRoughnessLarge = spNoiseGet(noise1, spVec3Mul(p, 32.0 * scales.y), 6) * influences.y;
+	double scaleYMultiplier = scales.y / 4.0;
+
+	double mountainTopRoughnessLarge = spNoiseGet(noise1, spVec3Mul(p, 32.0 * scaleYMultiplier ), 6) * influences.y;
 	double mountainTopRoughnessMid = spNoiseGet(noise1, spVec3Mul(pz, 1024.0 * scales.z), 6) * influences.z;
 	//double mountainTopRoughnessSmall = 0.0;
-	double lookupB = spNoiseGet(noise1, spVec3Mul(p, 64.0 * scales.y), 6) * influences.y;
+	double lookupB = spNoiseGet(noise1, spVec3Mul(p, 64.0 * scaleYMultiplier), 6) * influences.y;
 
 
-	double mountainSupressionBaseA = spNoiseGet(noise2, spVec3Mul(p, 9.0 * scales.y), 6) * influences.y;
-	double mountainSupressionBaseB = spNoiseGet(noise2, spVec3Mul(p, 500.0 * scales.y), 4) * influences.y;
-	double mountainSupressionBaseC = spNoiseGet(noise2, spVec3Mul(p, 120.0 * scales.y), 4) * influences.y;
+	double mountainSupressionBaseA = spNoiseGet(noise2, spVec3Mul(p, 9.0 * scaleYMultiplier), 6) * influences.y;
+	double mountainSupressionBaseB = spNoiseGet(noise2, spVec3Mul(p, 500.0 * scaleYMultiplier), 4) * influences.y;
+	double mountainSupressionBaseC = spNoiseGet(noise2, spVec3Mul(p, 120.0 * scaleYMultiplier), 4) * influences.y;
 	double mountainSupressionA = spMax(mountainSupressionBaseA, 0.0);
 	mountainSupressionA = mountainSupressionA + 0.05;
 	double mountainSupressionB = spMax(mountainSupressionBaseB, 0.05);
@@ -63,7 +65,7 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 	//SPVec4 resultDebug = {(spMax(mountainRanges * mountainSupressionA + (mountainTopRoughnessMid * 0.01 * mountainSupressionA), 0.0) - 0.05) * TERRAIN_HEIGHT_MAXISH, riverDistance, 0.0, 0.0};
 	//return resultDebug;
 
-	value += spNoiseGet(noise1, spVec3Mul(p, 50000.0 * scales.z), 4) * 0.0001 * influences.z;
+	value += spNoiseGet(noise1, spVec3Mul(pz, 50000.0 * scales.z), 4) * 0.0001 * influences.z;
 
 	value += (valueB * 0.02 - fabs(mountainSupressionBaseC) * 0.1 * (1.0 + spNoiseGet(noise1, spVec3Mul(pz, 12000.0 * scales.z), 2) * 0.1 * influences.z));
 
