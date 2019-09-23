@@ -96,13 +96,20 @@ void MurmurHash3_x86_32 ( const void * key, int len,
 	*(uint32_t*)out = h1;
 } 
 
-double randomValueForUniqueIDAndSeed(uint64_t uniqueID, uint32_t seed)
+double spRandomValueForUniqueIDAndSeed(uint64_t uniqueID, uint32_t seed)
 {
 	uint32_t hash;
 	MurmurHash3_x86_32(&uniqueID, sizeof(uint64_t), seed, &hash);
 	double value = hash;
 	value = value / UINT32_MAX;
 	return value;
+}
+
+uint32_t spRandomIntegerValueForUniqueIDAndSeed(uint64_t uniqueID, uint32_t seed, uint32_t max)
+{
+	uint32_t hash;
+	MurmurHash3_x86_32(&uniqueID, sizeof(uint64_t), seed, &hash);
+	return hash % max;
 }
 
 SPRand* spRandNew(uint32_t seed)
@@ -124,14 +131,14 @@ void spRandDelete(SPRand* spRand)
 SPVec3 spRandGetVec3(SPRand* spRand)
 {
 	SPVec3 result = {
-		(randomValueForUniqueIDAndSeed(spRand->counter++, spRand->seed) - 0.5) * 2.0,
-		(randomValueForUniqueIDAndSeed(spRand->counter++, spRand->seed) - 0.5) * 2.0,
-		(randomValueForUniqueIDAndSeed(spRand->counter++, spRand->seed) - 0.5) * 2.0
+		(spRandomValueForUniqueIDAndSeed(spRand->counter++, spRand->seed) - 0.5) * 2.0,
+		(spRandomValueForUniqueIDAndSeed(spRand->counter++, spRand->seed) - 0.5) * 2.0,
+		(spRandomValueForUniqueIDAndSeed(spRand->counter++, spRand->seed) - 0.5) * 2.0
 	};
 	return result;
 }
 
 double spRandGetValue(SPRand* spRand)
 {
-	return randomValueForUniqueIDAndSeed(spRand->counter++, spRand->seed);
+	return spRandomValueForUniqueIDAndSeed(spRand->counter++, spRand->seed);
 }

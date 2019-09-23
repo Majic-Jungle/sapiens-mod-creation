@@ -20,7 +20,8 @@ static uint16_t biomeTag_temperate;
 static uint16_t biomeTag_coldWinter;
 static uint16_t biomeTag_drySummer;
 static uint16_t biomeTag_dryWinter;
-static uint16_t biomeTag_lightForest;
+static uint16_t biomeTag_sparseForest;
+static uint16_t biomeTag_mediumForest;
 static uint16_t biomeTag_denseForest;
 static uint16_t biomeTag_plains;
 
@@ -43,49 +44,65 @@ static uint16_t terrainType_temperateGrass;
 static uint16_t terrainType_redRock;
 static uint16_t terrainType_dirt;
 
+static uint16_t gameObjectType_appleTree1;
+
+#define BIRCH_TYPE_COUNT 4
+static uint16_t gameObjectType_birchTypes[BIRCH_TYPE_COUNT];
 
 void spBiomeInit(SPBiomeThreadState* threadState)
 {
-	biomeTag_cold = threadState->getBiomeTag(threadState->managerObject, "cold");
-	biomeTag_hot = threadState->getBiomeTag(threadState->managerObject, "hot");
-	biomeTag_wet = threadState->getBiomeTag(threadState->managerObject, "wet");
-	biomeTag_dry = threadState->getBiomeTag(threadState->managerObject, "dry");
-	biomeTag_desert = threadState->getBiomeTag(threadState->managerObject, "desert");
-	biomeTag_steppe = threadState->getBiomeTag(threadState->managerObject, "steppe");
-	biomeTag_rainforest = threadState->getBiomeTag(threadState->managerObject, "rainforest");
-	biomeTag_tropical = threadState->getBiomeTag(threadState->managerObject, "tropical");
-	biomeTag_monsoon = threadState->getBiomeTag(threadState->managerObject, "monsoon");
-	biomeTag_savanna = threadState->getBiomeTag(threadState->managerObject, "savanna");
-	biomeTag_polar = threadState->getBiomeTag(threadState->managerObject, "polar");
-	biomeTag_icecap = threadState->getBiomeTag(threadState->managerObject, "icecap");
-	biomeTag_tundra = threadState->getBiomeTag(threadState->managerObject, "tundra");
-	biomeTag_temperate = threadState->getBiomeTag(threadState->managerObject, "temperate");
-	biomeTag_coldWinter = threadState->getBiomeTag(threadState->managerObject, "coldWinter");
-	biomeTag_drySummer = threadState->getBiomeTag(threadState->managerObject, "drySummer");
-	biomeTag_dryWinter = threadState->getBiomeTag(threadState->managerObject, "dryWinter");
-	biomeTag_lightForest = threadState->getBiomeTag(threadState->managerObject, "lightForest");
-	biomeTag_denseForest = threadState->getBiomeTag(threadState->managerObject, "denseForest");
-	biomeTag_plains = threadState->getBiomeTag(threadState->managerObject, "plains");
+	biomeTag_cold = threadState->getBiomeTag(threadState, "cold");
+	biomeTag_hot = threadState->getBiomeTag(threadState, "hot");
+	biomeTag_wet = threadState->getBiomeTag(threadState, "wet");
+	biomeTag_dry = threadState->getBiomeTag(threadState, "dry");
+	biomeTag_desert = threadState->getBiomeTag(threadState, "desert");
+	biomeTag_steppe = threadState->getBiomeTag(threadState, "steppe");
+	biomeTag_rainforest = threadState->getBiomeTag(threadState, "rainforest");
+	biomeTag_tropical = threadState->getBiomeTag(threadState, "tropical");
+	biomeTag_monsoon = threadState->getBiomeTag(threadState, "monsoon");
+	biomeTag_savanna = threadState->getBiomeTag(threadState, "savanna");
+	biomeTag_polar = threadState->getBiomeTag(threadState, "polar");
+	biomeTag_icecap = threadState->getBiomeTag(threadState, "icecap");
+	biomeTag_tundra = threadState->getBiomeTag(threadState, "tundra");
+	biomeTag_temperate = threadState->getBiomeTag(threadState, "temperate");
+	biomeTag_coldWinter = threadState->getBiomeTag(threadState, "coldWinter");
+	biomeTag_drySummer = threadState->getBiomeTag(threadState, "drySummer");
+	biomeTag_dryWinter = threadState->getBiomeTag(threadState, "dryWinter");
+	biomeTag_sparseForest = threadState->getBiomeTag(threadState, "sparseForest");
+	biomeTag_mediumForest = threadState->getBiomeTag(threadState, "mediumForest");
+	biomeTag_denseForest = threadState->getBiomeTag(threadState, "denseForest");
+	biomeTag_plains = threadState->getBiomeTag(threadState, "plains");
 
 
-	terrainType_tundraGrass = threadState->getTerrainTypeIndex(threadState->managerObject, "tundraGrass");
-	terrainType_rock = threadState->getTerrainTypeIndex(threadState->managerObject, "rock");
-	terrainType_beachSand = threadState->getTerrainTypeIndex(threadState->managerObject, "beachSand");
-	terrainType_gravel = threadState->getTerrainTypeIndex(threadState->managerObject, "gravel");
-	terrainType_water = threadState->getTerrainTypeIndex(threadState->managerObject, "water");
-	terrainType_desertSand = threadState->getTerrainTypeIndex(threadState->managerObject, "steppeMostlyGrass");
-	terrainType_steppeMostlyGrass = threadState->getTerrainTypeIndex(threadState->managerObject, "steppeMostlyDirt");
-	terrainType_steppeMostlyDirt = threadState->getTerrainTypeIndex(threadState->managerObject, "tundraGrass");
-	terrainType_tropicalRainforestGrass = threadState->getTerrainTypeIndex(threadState->managerObject, "tropicalRainforestGrass");
-	terrainType_monsoonGrass = threadState->getTerrainTypeIndex(threadState->managerObject, "monsoonGrass");
-	terrainType_savannaGrass = threadState->getTerrainTypeIndex(threadState->managerObject, "savannaGrass");
-	terrainType_iceCap = threadState->getTerrainTypeIndex(threadState->managerObject, "iceCap");
-	terrainType_desertRedSand = threadState->getTerrainTypeIndex(threadState->managerObject, "desertRedSand");
-	terrainType_taigaGrass = threadState->getTerrainTypeIndex(threadState->managerObject, "taigaGrass");
-	terrainType_mediterraneanGrass = threadState->getTerrainTypeIndex(threadState->managerObject, "mediterraneanGrass");
-	terrainType_temperateGrass = threadState->getTerrainTypeIndex(threadState->managerObject, "temperateGrass");
-	terrainType_redRock = threadState->getTerrainTypeIndex(threadState->managerObject, "redRock");
-	terrainType_dirt = threadState->getTerrainTypeIndex(threadState->managerObject, "dirt");
+	terrainType_tundraGrass = threadState->getTerrainTypeIndex(threadState, "tundraGrass");
+	terrainType_rock = threadState->getTerrainTypeIndex(threadState, "rock");
+	terrainType_beachSand = threadState->getTerrainTypeIndex(threadState, "beachSand");
+	terrainType_gravel = threadState->getTerrainTypeIndex(threadState, "gravel");
+	terrainType_water = threadState->getTerrainTypeIndex(threadState, "water");
+	terrainType_desertSand = threadState->getTerrainTypeIndex(threadState, "desertSand");
+	terrainType_steppeMostlyGrass = threadState->getTerrainTypeIndex(threadState, "steppeMostlyGrass");
+	terrainType_steppeMostlyDirt = threadState->getTerrainTypeIndex(threadState, "steppeMostlyDirt");
+	terrainType_tundraGrass = threadState->getTerrainTypeIndex(threadState, "tundraGrass");
+	terrainType_tropicalRainforestGrass = threadState->getTerrainTypeIndex(threadState, "tropicalRainforestGrass");
+	terrainType_monsoonGrass = threadState->getTerrainTypeIndex(threadState, "monsoonGrass");
+	terrainType_savannaGrass = threadState->getTerrainTypeIndex(threadState, "savannaGrass");
+	terrainType_iceCap = threadState->getTerrainTypeIndex(threadState, "iceCap");
+	terrainType_desertRedSand = threadState->getTerrainTypeIndex(threadState, "desertRedSand");
+	terrainType_taigaGrass = threadState->getTerrainTypeIndex(threadState, "taigaGrass");
+	terrainType_mediterraneanGrass = threadState->getTerrainTypeIndex(threadState, "mediterraneanGrass");
+	terrainType_temperateGrass = threadState->getTerrainTypeIndex(threadState, "temperateGrass");
+	terrainType_redRock = threadState->getTerrainTypeIndex(threadState, "redRock");
+	terrainType_dirt = threadState->getTerrainTypeIndex(threadState, "dirt");
+
+	if(threadState->getGameObjectTypeIndex) //this function isn't set where game object types aren't required eg. in the initial world creation screen
+	{
+		gameObjectType_appleTree1 = threadState->getGameObjectTypeIndex(threadState, "appleTree1");
+
+		gameObjectType_birchTypes[0] = threadState->getGameObjectTypeIndex(threadState, "birch1");
+		gameObjectType_birchTypes[1] = threadState->getGameObjectTypeIndex(threadState, "birch2");
+		gameObjectType_birchTypes[2] = threadState->getGameObjectTypeIndex(threadState, "birch3");
+		gameObjectType_birchTypes[3] = threadState->getGameObjectTypeIndex(threadState, "birch4");
+	}
 }
 
 void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
@@ -114,6 +131,8 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 	{
 		temperatureThreshold = temperatureThreshold + 140.0f;
 	}
+
+
 
 	if (annualRainfall < temperatureThreshold) // B
 	{
@@ -172,6 +191,28 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 			else // C or D
 			{
 				tagsOut[tagCount++] = biomeTag_temperate;
+
+				SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 2000.0);
+				double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
+				if(noiseValue > -0.2)
+				{
+					if(noiseValue > 0.3)
+					{
+						tagsOut[tagCount++] = biomeTag_denseForest;
+					}
+					else if(noiseValue > 0.0)
+					{
+						tagsOut[tagCount++] = biomeTag_mediumForest;
+					}
+					else
+					{
+						tagsOut[tagCount++] = biomeTag_sparseForest;
+					}
+				}
+				else
+				{
+					tagsOut[tagCount++] = biomeTag_plains;
+				}
 
 				if (temperatureWinter < -5.0f)
 				{
@@ -375,171 +416,103 @@ uint16_t spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState,
 	return terrainType_dirt;
 }
 
-/*
-int spBiomeGetClimate(float temperatureSummer, 
-	float temperatureWinter, 
-	float rainfallSummer, 
-	float rainfallWinter)
-{
-	float annualRainfall = rainfallSummer + rainfallWinter;
-	float averageTemp = (temperatureSummer + temperatureWinter) * 0.5f;
-	float temperatureThreshold = averageTemp * 20.0f;
-
-	if(rainfallSummer > rainfallWinter * 2.3f)
-	{
-		temperatureThreshold = temperatureThreshold + 280.0f;
-	}
-	else if(rainfallWinter < rainfallSummer * 2.3f)
-	{
-		temperatureThreshold = temperatureThreshold + 140.0f;
-	}
-
-	if(annualRainfall < temperatureThreshold) // B
-	{
-		if(annualRainfall < temperatureThreshold * 0.5)
-		{
-			if(averageTemp >= 18.0f)
-			{
-				return spc_aridDesertHot;
-			}
-			else
-			{
-				return spc_aridDesertCold;
-			}
-		}
-		else
-		{
-			if(averageTemp >= 18.0f)
-			{
-				return spc_aridSteppeHot;
-			}
-			else
-			{
-				return spc_aridSteppeCold;
-			}
-		}
-	}
-	else
-	{
-		if(temperatureWinter > 18.0f) // A
-		{
-			float driestMonth = (float)spMin(rainfallSummer, rainfallWinter) / 6.0f;
-			if(driestMonth > 60.0f)
-			{
-				return  spc_tropicalRainforest;
-			}
-			else if(driestMonth > (100.0f - (annualRainfall / 25.0f)) )
-			{
-				return  spc_tropicalMonsoon;
-			}
-			else
-			{
-				return  spc_tropicalSavanna;
-			}
-		}
-		else
-		{
-			if(temperatureSummer < -2.0f)// EF
-			{
-				return  spc_polarIceCap;
-			}
-			else if(temperatureSummer < 8.0f)// ET
-			{
-				return  spc_polarTundra;
-			}
-			else // C or D
-			{
-				if(rainfallSummer < 30.0f && rainfallSummer < rainfallWinter / 3.0f)
-				{
-					if(temperatureWinter < -5.0f)
-					{
-						return spc_coldDrySummer;
-					}
-					else
-					{
-						return spc_temperateDrySummer;
-					}
-				}
-				else if(rainfallWinter < rainfallSummer / 10.0f)
-				{
-					if(temperatureWinter < -5.0f)
-					{
-						return spc_coldDryWinter;
-					}
-					else
-					{
-						return spc_temperateDryWinter;
-					}
-				}
-				else
-				{
-					if(temperatureWinter < -5.0f)
-					{
-						return spc_coldWetHotSummer;
-					}
-					else
-					{
-						return spc_temperateWetHotSummer;
-					}
-				}
-			}
-		}
-	}
-
-}
-
-
-
-int spBiomeGetBiomeType(int climateType)
-{
-	return climateType;
-}
-
-
-#define isBeach(_altitude_) ((_altitude_) < 0.0000001)
-#define rockSteepness 0.2
-
-int spBiomeGetSurfaceType(SPNoise* noise, 
-	SPBiomeType* biomeType,
+int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* threadState,
+	int incomingTypeCount,
+	uint16_t* types,
+	uint16_t* biomeTags,
+	int tagCount,
 	SPVec3 pointNormal, 
-	SPVec3 noiseLoc,
-	int vegetationState, 
-	double altitude,
+	SPVec3 noiseLoc, 
+	uint64_t faceUniqueID, 
+	int level, 
+	double altitude, 
 	float steepness,
+	uint16_t terrainType, 
 	float riverDistance)
 {
-	if(vegetationState == 1)
+	int addedCount = incomingTypeCount;
+
+	if(addedCount < BIOME_MAX_GAME_OBJECT_COUNT_PER_SUBDIVISION)
 	{
-		if(isBeach(altitude))
+		if(altitude > 0.0)
 		{
-			return biomeType->beachTerrainType;
+			if(level >= SP_SUBDIVISIONS - 6)
+			{
+				SPVec3 noiseLookupBAddition = {107.6,26.6,89.4};
+				SPVec3 noiseLookupMedAddition = {1.25,1.1,1.5};
+				SPVec3 noiseLookupHighAddition = {1.2,1.2,1.2};
+
+				SPVec3 noiseLookup = spVec3Mul(noiseLoc, 999.0);
+				SPVec3 noiseLookupB = spVec3Add(noiseLookup, noiseLookupBAddition);
+				//SPVec3 noiseLookupMedFreq = spVec3Mul(spVec3Add(noiseLookup,noiseLookupMedAddition), 20000.0);
+				//SPVec3 noiseLookupHighFreq = spVec3Mul(spVec3Add(noiseLookup,noiseLookupHighAddition), 99999.0);
+
+				if(level == SP_SUBDIVISIONS - 6)
+				{
+					//double baseDensityNoise = spNoiseGet(threadState->spNoise1, noiseLookupMedFreq, 1);
+					//if(baseDensityNoise > -0.1)
+					//{
+						if(spNoiseGetChance(threadState->spNoise1, noiseLookupB, 3, 1, 2, faceUniqueID, 42))
+						{
+							types[addedCount++] = gameObjectType_appleTree1;
+							if(addedCount >= BIOME_MAX_GAME_OBJECT_COUNT_PER_SUBDIVISION)
+							{
+								return addedCount;
+							}
+						}
+
+						int forestDensity = 0;
+						for(int i = 0; i < tagCount; i++)
+						{
+							if(biomeTags[i] == biomeTag_denseForest)
+							{
+								forestDensity = 3;
+								break;
+							}
+							else if(biomeTags[i] == biomeTag_mediumForest)
+							{
+								forestDensity = 2;
+								break;
+							}
+							else if(biomeTags[i] == biomeTag_sparseForest)
+							{
+								forestDensity = 1;
+								break;
+							}
+						}
+
+						if(forestDensity > 0)
+						{
+							int treeCount = 0;
+							switch(forestDensity)
+							{
+							case 1:
+								treeCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3254, 8) - 6;
+								break;
+							case 2:
+								treeCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3254, 4) + 2;
+								break;
+							case 3:
+								treeCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3254, 8) + 8;
+								break;
+
+							}
+
+							for(int i = 0; i < treeCount; i++)
+							{
+								int birchType = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 22245 + i, 4);
+								types[addedCount++] = gameObjectType_birchTypes[birchType];
+								if(addedCount >= BIOME_MAX_GAME_OBJECT_COUNT_PER_SUBDIVISION)
+								{
+									return addedCount;
+								}
+							}
+						}
+
+					//}
+				}
+			}
 		}
-			
-		return biomeType->vegetationStrippedTerrainType;
 	}
-
-	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 599999.0);
-	double noiseValue = spNoiseGet(noise, scaledNoiseLoc, 4);
-
-	if(steepness > rockSteepness + noiseValue * 0.2)
-	{
-		return biomeType->rockTerrainType;
-	}
-
-	if(isBeach(altitude))
-	{
-		return biomeType->beachTerrainType;
-	}
-
-	if(steepness > noiseValue + 0.5)
-	{
-		return biomeType->vegetationStrippedTerrainType;
-	}
-
-	if(biomeType->secondaryTerrainType != 0 && noiseValue > 0.0)
-	{
-		return biomeType->secondaryTerrainType;
-	}
-
-	return biomeType->normalTerrainType;
-}*/
+	return addedCount;
+}

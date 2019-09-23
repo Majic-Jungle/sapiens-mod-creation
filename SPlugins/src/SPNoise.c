@@ -2,6 +2,7 @@
 
 #include "SPNoise.h"
 #include "SPCommon.h"
+#include "SPRand.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -205,4 +206,24 @@ double spNoiseGet(SPNoise* noise, SPVec3 vec, int endOctave)
 	}
 
 	return result;
+}
+
+double spNoiseGetRangedFraction(SPNoise* noise, SPVec3 vec, int endOctave)
+{
+	double rawValue = spNoiseGet(noise, vec, endOctave);
+	return spClamp(rawValue * rawValue * 8.0, 0.0, 1.0);
+}
+
+bool spNoiseGetChance(SPNoise* noise,
+	SPVec3 vec,
+	int endOctave,
+	uint32_t chanceNumerator,
+	uint32_t chanceDenominator,
+	uint64_t uniqueID,
+	uint32_t seed)
+{
+	double rangedFractionValue = spNoiseGetRangedFraction(noise, vec, endOctave);
+	uint32_t randomValue = spRandomIntegerValueForUniqueIDAndSeed(uniqueID, seed, chanceDenominator * 1000);
+	bool win = (randomValue < rangedFractionValue * chanceNumerator * 1000);
+	return win;
 }
