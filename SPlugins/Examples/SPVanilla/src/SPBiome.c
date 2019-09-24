@@ -53,6 +53,8 @@ static uint16_t gameObjectType_raspberryBush;
 
 static uint16_t gameObjectType_rock;
 static uint16_t gameObjectType_smallRock;
+static uint16_t gameObjectType_birchBranch;
+static uint16_t gameObjectType_pineBranch;
 
 #define BIRCH_TYPE_COUNT 7
 static uint16_t gameObjectType_birchTypes[BIRCH_TYPE_COUNT];
@@ -115,7 +117,9 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 		gameObjectType_raspberryBush = threadState->getGameObjectTypeIndex(threadState, "raspberryBush");
 
 		gameObjectType_rock = threadState->getGameObjectTypeIndex(threadState, "rock");
-		gameObjectType_smallRock = threadState->getGameObjectTypeIndex(threadState, "smallRock");		
+		gameObjectType_smallRock = threadState->getGameObjectTypeIndex(threadState, "smallRock");
+		gameObjectType_birchBranch = threadState->getGameObjectTypeIndex(threadState, "birchBranch");
+		gameObjectType_pineBranch = threadState->getGameObjectTypeIndex(threadState, "pineBranch");
 
 		gameObjectType_birchTypes[0] = threadState->getGameObjectTypeIndex(threadState, "birch1");
 		gameObjectType_birchTypes[1] = threadState->getGameObjectTypeIndex(threadState, "birch2");
@@ -260,11 +264,25 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 					tagsOut[tagCount++] = biomeTag_coldWinter;
 				}
 
+				bool drySummer = false;
+				if (rainfallSummer < 30.0f && rainfallSummer < rainfallWinter / 3.0f)
+				{
+					tagsOut[tagCount++] = biomeTag_drySummer;
+					drySummer = true;
+				}
+				else if (rainfallWinter < rainfallSummer / 10.0f)
+				{
+					tagsOut[tagCount++] = biomeTag_dryWinter;
+				}
+
 				SPVec3 scaledNoiseLocB = spVec3Mul(noiseLoc, 12501.0);
 				double noiseValueB = spNoiseGet(threadState->spNoise1, scaledNoiseLocB, 4);
 				if(temperatureSummer > noiseValueB * 4.0 + 10.0f)
 				{
-					tagsOut[tagCount++] = biomeTag_birch;
+					if(!drySummer)
+					{
+						tagsOut[tagCount++] = biomeTag_birch;
+					}
 					if(temperatureWinter < noiseValueB * 10.0 - 5.0f)
 					{
 						tagsOut[tagCount++] = biomeTag_coniferous;
@@ -275,15 +293,6 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 					tagsOut[tagCount++] = biomeTag_coniferous;
 				}
 
-
-				if (rainfallSummer < 30.0f && rainfallSummer < rainfallWinter / 3.0f)
-				{
-					tagsOut[tagCount++] = biomeTag_drySummer;
-				}
-				else if (rainfallWinter < rainfallSummer / 10.0f)
-				{
-					tagsOut[tagCount++] = biomeTag_dryWinter;
-				}
 			}
 		}
 	}
@@ -473,6 +482,43 @@ uint16_t spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState,
 	return terrainType_dirt;
 }
 
+void getForestInfo(uint16_t* biomeTags,
+	int tagCount,
+	int* forestDensity,
+	bool* coniferous,
+	bool* birch
+	)
+{
+	for(int i = 0; i < tagCount; i++)
+	{
+		if(biomeTags[i] == biomeTag_denseForest)
+		{
+			*forestDensity = 4;
+		}
+		else if(biomeTags[i] == biomeTag_mediumForest)
+		{
+			*forestDensity = 3;
+		}
+		else if(biomeTags[i] == biomeTag_sparseForest)
+		{
+			*forestDensity = 2;
+		}
+		else if(biomeTags[i] == biomeTag_verySparseForest)
+		{
+			*forestDensity = 1;
+		}
+
+		if(biomeTags[i] == biomeTag_coniferous)
+		{
+			*coniferous = true;
+		}
+		if(biomeTags[i] == biomeTag_birch)
+		{
+			*birch = true;
+		}
+	}
+}
+
 #define ADD_OBJECT(__addType__)\
 types[addedCount++] = __addType__;\
 if(addedCount >= BIOME_MAX_GAME_OBJECT_COUNT_PER_SUBDIVISION)\
@@ -502,55 +548,34 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 		{
 			if(level >= SP_SUBDIVISIONS - 5)
 			{
-				//SPVec3 noiseLookupBAddition = {107.6,26.6,89.4};
-				SPVec3 noiseLookupMedAddition = {1.25,1.1,1.5};
-				SPVec3 noiseLookupHighAddition = {1.2,1.2,1.2};
-
 				SPVec3 noiseLookup = spVec3Mul(noiseLoc, 999.0);
-				//SPVec3 noiseLookupB = spVec3Add(noiseLookup, noiseLookupBAddition);
-				//SPVec3 noiseLookupMedFreq = spVec3Mul(spVec3Add(noiseLookup,noiseLookupMedAddition), 20000.0);
-				//SPVec3 noiseLookupHighFreq = spVec3Mul(spVec3Add(noiseLookup,noiseLookupHighAddition), 99999.0);
 
 				if(level == SP_SUBDIVISIONS - 5)
 				{
-					if(spNoiseGetChance(threadState->spNoise1, noiseLookup, 3, 1, 2, faceUniqueID, 42))
-					{
-						ADD_OBJECT(gameObjectType_appleTree1);
-					}
-
 					int forestDensity = 0;
 					bool coniferous = false;
 					bool birch = false;
+					getForestInfo(biomeTags,
+						tagCount,
+						&forestDensity,
+						&coniferous,
+						&birch);
 
-					for(int i = 0; i < tagCount; i++)
+					if(forestDensity > 0)
 					{
-						if(biomeTags[i] == biomeTag_denseForest)
-						{
-							forestDensity = 4;
-						}
-						else if(biomeTags[i] == biomeTag_mediumForest)
-						{
-							forestDensity = 3;
-						}
-						else if(biomeTags[i] == biomeTag_sparseForest)
-						{
-							forestDensity = 2;
-						}
-						else if(biomeTags[i] == biomeTag_verySparseForest)
-						{
-							forestDensity = 1;
-						}
+						SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 31.0);
+						double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 3);
 
-						if(biomeTags[i] == biomeTag_coniferous)
+						if(noiseValue > 0.2)
 						{
-							coniferous = true;
+							int objectCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 9235, 16) - 12;
+							for(int i = 0; i < objectCount; i++)
+							{
+								ADD_OBJECT(gameObjectType_appleTree1);
+							}
 						}
-						if(biomeTags[i] == biomeTag_birch)
-						{
-							birch = true;
-						}
-						
 					}
+
 
 					int treeCount = 0;
 					if(coniferous || birch)
@@ -670,6 +695,30 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 					{
 						ADD_OBJECT(gameObjectType_rock);
 					}
+
+					int forestDensity = 0;
+					bool coniferous = false;
+					bool birch = false;
+					getForestInfo(biomeTags,
+						tagCount,
+						&forestDensity,
+						&coniferous,
+						&birch);
+					if(forestDensity > 0)
+					{
+						int denominator = 100 / (forestDensity * forestDensity);
+						denominator = spMax(denominator, 2);
+						int roll = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 235432, denominator);
+						if(coniferous && roll == 0)
+						{
+							ADD_OBJECT(gameObjectType_pineBranch);
+						}
+						if(birch && roll == 1)
+						{
+							ADD_OBJECT(gameObjectType_birchBranch);
+						}
+					}
+
 				}
 				else if(level == SP_SUBDIVISIONS - 1)
 				{
