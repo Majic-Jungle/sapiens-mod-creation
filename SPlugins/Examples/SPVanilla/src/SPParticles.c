@@ -263,14 +263,14 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 			if(emitterState->counters[1] == 0) //FLAME 1
 			{
 				SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(0.04));
-				double scaleAverage = 0.5;
+				double scaleAverage = 0.3;
 
 				emitFireParticle(threadState,
 					emitterState,
 					scaleAverage,
 					randPosVec);
 
-				emitterState->counters[1] = 5 + (uint8_t)(20 * spRandGetValue(spRand));
+				emitterState->counters[1] = 5 + (uint8_t)(10 * spRandGetValue(spRand));
 
 			}
 			else
@@ -282,14 +282,14 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 			{
 				SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(0.04));
 				randPosVec = spVec3Add(randPosVec, spVec3Mul(spMat3GetRow(emitterState->rot, 0), SP_METERS_TO_PRERENDER(0.2)));
-				double scaleAverage = 0.35;
+				double scaleAverage = 0.15;
 
 				emitFireParticle(threadState, 
 					emitterState,
 					scaleAverage,
 					randPosVec);
 
-				emitterState->counters[2] = 5 + (uint8_t)(20 * spRandGetValue(spRand));
+				emitterState->counters[2] = 5 + (uint8_t)(10 * spRandGetValue(spRand));
 
 			}
 			else
@@ -301,18 +301,18 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 			{
 				SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(0.04));
 				randPosVec = spVec3Add(randPosVec, spVec3Mul(spMat3GetRow(emitterState->rot, 2), SP_METERS_TO_PRERENDER(0.1)));
-				double scaleAverage = 0.2;
+				double scaleAverage = 0.1;
 
 				emitFireParticle(threadState, 
 					emitterState,
 					scaleAverage,
 					randPosVec);
 
-				emitterState->counters[3] = 5 + (uint8_t)(20 * spRandGetValue(spRand));
+				emitterState->counters[3] = 5 + (uint8_t)(10 * spRandGetValue(spRand));
 			}
 			else 
 			{
-				if(emitterState->counters[3] == 18) //spark
+				if(emitterState->counters[3] == 8) //spark
 				{
 
 					double posLength = spVec3Length(emitterState->p);
@@ -369,7 +369,7 @@ bool spUpdateParticle(SPParticleThreadState* threadState,
 	}
 	else if(localRenderGroupTypeID == sp_vanillaRenderGroupFire)
 	{
-		lifeLeftMultiplier = (1.5 - particleState->randomValueB * 0.5);
+		lifeLeftMultiplier = (2.0 - particleState->randomValueB * 0.5);
 	}
 	else if(localRenderGroupTypeID == sp_vanillaRenderGroupSpark)
 	{
@@ -388,7 +388,7 @@ bool spUpdateParticle(SPParticleThreadState* threadState,
 	if(localRenderGroupTypeID == sp_vanillaRenderGroupFire)
 	{
 
-		particleState->p = spVec3Add(particleState->p, spVec3Mul(particleState->v, (2.0 - lifeLeft) * dt));
+		particleState->p = spVec3Add(particleState->p, spVec3Mul(particleState->v, (2.0 - lifeLeft) * dt * 1.5));
 	}
 	else if(localRenderGroupTypeID == sp_vanillaRenderGroupSmoke)
 	{

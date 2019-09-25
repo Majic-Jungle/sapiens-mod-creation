@@ -65,29 +65,46 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 	//SPVec4 resultDebug = {(spMax(mountainRanges * mountainSupressionA + (mountainTopRoughnessMid * 0.01 * mountainSupressionA), 0.0) - 0.05) * TERRAIN_HEIGHT_MAXISH, riverDistance, 0.0, 0.0};
 	//return resultDebug;
 
-	value += spNoiseGet(noise1, spVec3Mul(pz, 50000.0 * scales.z), 4) * 0.0001 * influences.z;
 
-	value += (valueB * 0.02 - fabs(mountainSupressionBaseC) * 0.1 * (1.0 + spNoiseGet(noise1, spVec3Mul(pz, 12000.0 * scales.z), 2) * 0.1 * influences.z));
+	/*double riverPlaneLevelNoiseValue = spNoiseGet(noise1, spVec3Mul(p, 14.0), 2);
+	double riverPlaneLevel = spMax(0.0001 + 0.03 * riverPlaneLevelNoiseValue, 0.000001);
+	if(riverDistance > riverPlaneLevel)
+	{
+		riverDistance = spMax(riverDistance - 0.01, 0.0) / (1.0 - 0.01) + riverPlaneLevel;
+	}*/
+
+	double valleyShapePower = spNoiseGet(noise1, spVec3Mul(p, 8.1), 1);
+	riverDistance = pow(riverDistance, 1.0 + valleyShapePower);
+
 
 	value *= TERRAIN_HEIGHT_MAXISH;
+
+
+	double valleyDistanceAtLowAltitudesMultiplier = spNoiseGet(noise1, spVec3Mul(p, 12.1), 2);
+	valleyDistanceAtLowAltitudesMultiplier = spClamp(valleyDistanceAtLowAltitudesMultiplier * 4.0, 0.0, 1.0);
+
+	riverDistance = riverDistance * (1.0 + spSmoothStep(0.2, 0.0, value * 4000.0) * 100.0 * valleyDistanceAtLowAltitudesMultiplier);
+	riverDistance = spMin(riverDistance, 1.0);
+
+	value += (valueB * 0.02 - fabs(mountainSupressionBaseC) * 0.1 * (1.0 + spNoiseGet(noise1, spVec3Mul(pz, 12000.0 * scales.z), 2) * 0.1 * influences.z)) * TERRAIN_HEIGHT_MAXISH;
+
 	value += mountainRanges * (mountainTopRoughnessMid * 0.02) * TERRAIN_HEIGHT_MAXISH * mountainSupressionA;
+	value += spNoiseGet(noise1, spVec3Mul(pz, 50000.0 * scales.z), 4) * 0.0001 * influences.z * TERRAIN_HEIGHT_MAXISH;
 
 	value = (value + worldGenOptions.heightOffset);
 
-	riverDistance = (riverDistance - 0.004) / (1.0 - 0.004);
 
-	double riverPlaneLevelNoiseValue = spNoiseGet(noise1, spVec3Mul(p, 236.0), 5);
-	double riverPlaneLevel = 0.01 + 0.03 * riverPlaneLevelNoiseValue;
-	if(riverDistance > riverPlaneLevel)
-	{
-		riverDistance = spMax(riverDistance - 0.1, 0.0) / (1.0 - 0.1) + riverPlaneLevel;
-	}
+	riverDistance = (riverDistance - 0.00004) / (1.0 - 0.00004);
 
-	double riverDepth = spSmoothStep(0.99, 1.0, 1.0 - riverDistance) * 0.0000004;
+
+	double riverDepth = spSmoothStep(0.999, 1.0, 1.0 - riverDistance) * 0.0000004;
 	double oceanMultiplier = spSmoothStep(0.0, -0.00000001, value);
 	riverDistance = spMix(riverDistance, 1.0, oceanMultiplier);
 
-	value = spMix(value * riverDistance, value, spSmoothStep(1.0, 2.3, value * 2000.0) + 0.0001);
+
+
+
+	value = spMix(value * riverDistance, value, spSmoothStep(1.0, 2.3, value * 4000.0) + 0.0001);
 	value = value - riverDepth;
 
 	if(value > 0.000001)
