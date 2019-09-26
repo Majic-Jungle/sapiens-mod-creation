@@ -4,7 +4,6 @@ project(SPVanilla VERSION 0.0.1)
 
 add_library(SPVanilla SHARED
     ../src/SPBiome.c
-    ../src/SPClimate.c
     ../src/SPHeight.c
     ../src/SPParticles.c
     ../src/SPRainfall.c

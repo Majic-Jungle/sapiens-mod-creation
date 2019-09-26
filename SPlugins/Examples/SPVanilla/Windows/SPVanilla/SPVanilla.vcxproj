@@ -8,14 +8,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\SPBiome.c" />
-    <ClCompile Include="..\..\src\SPClimate.c" />
     <ClCompile Include="..\..\src\SPHeight.c" />
     <ClCompile Include="..\..\src\SPParticles.c" />
     <ClCompile Include="..\..\src\SPRainfall.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\include\SPBiome.h" />
-    <ClInclude Include="..\..\..\..\include\SPClimate.h" />
     <ClInclude Include="..\..\..\..\include\SPHeight.h" />
     <ClInclude Include="..\..\..\..\include\SPParticles.h" />
     <ClInclude Include="..\..\..\..\include\SPRainfall.h" />
