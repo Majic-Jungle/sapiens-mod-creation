@@ -22,16 +22,22 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 	SPVec3 scales = worldGenOptions.scales;
 	SPVec3 influences = worldGenOptions.influences;
 
-	double lookupOffset = fabs(spNoiseGet(noise1, spVec3Mul(noiseLoc,  0.8 * (0.5 + scales.x * 0.5)), 1)) * 0.8;
+	//double lookupOffset = fabs(spNoiseGet(noise1, spVec3Mul(noiseLoc,  0.8 * (0.5 + scales.x * 0.5)), 1)) * 0.8;
 
-	SPVec3 lookupOffsetVec = {lookupOffset + 1.2,lookupOffset + 1.2,lookupOffset + 1.2};
-	SPVec3 offsetPoint = spVec3Add(noiseLoc, lookupOffsetVec);
+	//SPVec3 lookupOffsetVec = {lookupOffset + 1.2,lookupOffset + 1.2,lookupOffset + 1.2};
+	SPVec3 offsetPoint = noiseLoc;//spVec3Add(noiseLoc, lookupOffsetVec);
 
 	SPVec3 pz = spVec3Mul(noiseLoc, 8.0);
 	SPVec3 op = spVec3Mul(offsetPoint, 8.0);
 
-	double lookupOffsetB = spNoiseGet(noise1, spVec3Mul(noiseLoc, 100.2 * scales.y), 1) * 0.005;
-	SPVec3 lookupOffsetVecB = {lookupOffsetB + 1.2,lookupOffsetB + 1.2,lookupOffsetB + 1.2};
+	SPVec3 offsetx = {1.4,1.8,1.3};
+	SPVec3 offsety= {1.7,1.1,1.2};
+
+	double lookupOffsetBx = spNoiseGet(noise1, spVec3Mul(spVec3Add(noiseLoc, offsetx), 125.2 * scales.y), 1) * 0.005;
+	double lookupOffsetBy = spNoiseGet(noise1, spVec3Mul(spVec3Add(noiseLoc, offsety), 134.2 * scales.y), 1) * 0.005;
+	double lookupOffsetBz = spNoiseGet(noise1, spVec3Mul(noiseLoc, 144.1 * scales.y), 1) * 0.005;
+
+	SPVec3 lookupOffsetVecB = {lookupOffsetBx + 1.2,lookupOffsetBy + 1.2,lookupOffsetBz + 1.2};
 	SPVec3 offsetPointB = spVec3Add(noiseLoc, lookupOffsetVecB);
 	SPVec3 p = spVec3Mul(offsetPointB, 8.0);
 

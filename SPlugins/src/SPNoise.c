@@ -115,7 +115,7 @@ SPNoise* spNoiseNew(int seed, double persistance)
 	while (--i)
 	{
 		k = noise->p[i];
-		noise->p[i] = noise->p[j = (int)spNoiseRand(noise) * PERLIN_B_FAST];
+		noise->p[i] = noise->p[j = (int)(spNoiseRand(noise) * PERLIN_B_FAST)];
 		noise->p[j] = k;
 	}
 

@@ -9,7 +9,7 @@ Sapiens is designed with modding in mind, to the extent that a mod could actuall
 
 # Lua
 
-Mods that wish to override or add Lua code, can do so by creating their lua files in a directory structure that mirrors the game's scripts directory. More documentation will be added on this later, but for now you can have a look at the scripts directory in the BlueUI-Lua-app-example.
+Mods that wish to override or add Lua code can do so by creating their lua files in a directory structure that mirrors the game's scripts directory. More documentation will be added on this later, but for now you can have a look at the scripts directory in the BlueUI-Lua-app-example.
 
 All you need to do is place the lua scripts in the right place, and they will get loaded. The vanilla lua code is always loaded first, and then the mod files are loaded, and mod:onload() is called, passing the vanilla module as an argument. This allows the mod to replace any data and/or functions of the vanilla object.
 
@@ -21,7 +21,7 @@ If you wish to override any of the vanilla shaders, sounds, images etc. then you
 
 C Mods in Sapiens are intended for performance intensive tasks, and at the moment that is per vertex terrain generation/biome and climate assignment, and the particle engine.
 
-In the SPlugins directory, you will the SPCommon library. SPCommon is the common code used by both the game engine and plugins, including math, Perlin noise functions and random number generation. This source repository includes the pre-built libraries and the required includes for using SPCommon. It also contains the source and projects for building SPCommon, though you shouldn't need to do that, it's only included for reference and debugging purposes. 
+In the SPlugins directory, is the SPCommon library. SPCommon is the common code used by both the game engine and plugins, including math, Perlin noise functions and random number generation. This source repository includes the pre-built libraries and the required includes for using SPCommon. It also contains the source and projects for building SPCommon, though you shouldn't need to do that, it's only included for reference and debugging purposes. 
 
 In SPlugins/Examples you will find SPVanilla. This is the vanilla/default plugin code, which is used by the game if no mods are installed. To create your own SPlugin library for inclusion in a mod, you would create a similar project that then overrode one or more of those functions.
 
