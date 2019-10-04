@@ -70,7 +70,7 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 
 	//SPVec4 resultDebug = {(spMax(mountainRanges * mountainSupressionA + (mountainTopRoughnessMid * 0.01 * mountainSupressionA), 0.0) - 0.05) * TERRAIN_HEIGHT_MAXISH, riverDistance, 0.0, 0.0};
 	//return resultDebug;
-
+	 
 
 	/*double riverPlaneLevelNoiseValue = spNoiseGet(noise1, spVec3Mul(p, 14.0), 2);
 	double riverPlaneLevel = spMax(0.0001 + 0.03 * riverPlaneLevelNoiseValue, 0.000001);
@@ -86,10 +86,10 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 	value *= TERRAIN_HEIGHT_MAXISH;
 
 
-	double valleyDistanceAtLowAltitudesMultiplier = spNoiseGet(noise1, spVec3Mul(p, 12.1), 2);
+	double valleyDistanceAtLowAltitudesMultiplier = fabs(spNoiseGet(noise1, spVec3Mul(pz, 40.5), 2));
 	valleyDistanceAtLowAltitudesMultiplier = spClamp(valleyDistanceAtLowAltitudesMultiplier * 4.0, 0.0, 1.0);
 
-	riverDistance = riverDistance * (1.0 + spSmoothStep(0.2, 0.0, value * 4000.0) * 100.0 * valleyDistanceAtLowAltitudesMultiplier);
+	riverDistance = riverDistance * (1.0 + spSmoothStep(0.2, 0.0, value * 4000.0) * 200.0 * valleyDistanceAtLowAltitudesMultiplier);
 	riverDistance = spMin(riverDistance, 1.0);
 
 	value += (valueB * 0.02 - fabs(mountainSupressionBaseC) * 0.1 * (1.0 + spNoiseGet(noise1, spVec3Mul(pz, 12000.0 * scales.z), 2) * 0.1 * influences.z)) * TERRAIN_HEIGHT_MAXISH;
@@ -112,6 +112,15 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 
 	value = spMix(value * riverDistance, value, spSmoothStep(1.0, 2.3, value * 4000.0) + 0.0001);
 	value = value - riverDepth;
+
+	if(riverDistance < 0.1 && value > 0.0)
+	{
+		double riverOffsetDistanceThreshold = spNoiseGet(noise1, spVec3Mul(pz, 1030.0), 2) * 0.05;
+		if(riverDistance > riverOffsetDistanceThreshold)
+		{
+			value += SP_METERS_TO_PRERENDER(1.0);
+		}
+	}
 
 	if(value > 0.000001)
 	{
