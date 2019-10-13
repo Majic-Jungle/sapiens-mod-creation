@@ -925,7 +925,7 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 				else if(level == SP_SUBDIVISIONS - 1)
 				{
 
-					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 200.0);
+					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 2000.0);
 					double rawValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 3);
 					double rangedFractionValue = rawValue * rawValue * 8.0;
 					if(terrainType == terrainType_gravel)
@@ -936,7 +936,7 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 					{
 						rangedFractionValue += 0.5;
 					}
-					int objectCount = ((int)spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 5243, 40)) - 40 + 2 * rangedFractionValue;
+					int objectCount = ((int)spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 5243, 40)) - 38 + 2 * rangedFractionValue;
 					for(int i = 0; i < objectCount; i++)
 					{
 						ADD_OBJECT(gameObjectType_smallRock);
