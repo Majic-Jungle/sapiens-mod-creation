@@ -47,8 +47,13 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 
 	double scaleYMultiplier = scales.y / 4.0;
 
+	double highResMultiplierA = spMax(spNoiseGet(noise1, spVec3Mul(pz, 1200.0), 1) + 0.1, 0.0);//spMax(spNoiseGet(noise1, spVec3Mul(pz, 500.0), 1) - 0.5, 0.0);
+	double highResMultiplierB = spMax(spNoiseGet(noise1, spVec3Mul(pz, 860.0), 1) + 0.2, 0.0);
+	double highResMultiplierC = spMax(spNoiseGet(noise1, spVec3Mul(pz, 384.0), 1) + 0.3, 0.0);
+
+
 	double mountainTopRoughnessLarge = spNoiseGet(noise1, spVec3Mul(p, 32.0 * scaleYMultiplier ), 6) * influences.y;
-	double mountainTopRoughnessMid = spNoiseGet(noise1, spVec3Mul(pz, 1024.0 * scales.z), 6) * influences.z;
+	double mountainTopRoughnessMid = spNoiseGet(noise1, spVec3Mul(pz, 1024.0 * scales.z), 6) * influences.z * highResMultiplierC;
 	//double mountainTopRoughnessSmall = 0.0;
 	double lookupB = spNoiseGet(noise1, spVec3Mul(p, 64.0 * scaleYMultiplier), 6) * influences.y;
 
@@ -92,10 +97,11 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 	riverDistance = riverDistance * (1.0 + spSmoothStep(0.2, 0.0, value * 4000.0) * 200.0 * valleyDistanceAtLowAltitudesMultiplier);
 	riverDistance = spMin(riverDistance, 1.0);
 
-	value += (valueB * 0.02 - fabs(mountainSupressionBaseC) * 0.1 * (1.0 + spNoiseGet(noise1, spVec3Mul(pz, 12000.0 * scales.z), 2) * 0.1 * influences.z)) * TERRAIN_HEIGHT_MAXISH;
+
+	value += (valueB * 0.02 - fabs(mountainSupressionBaseC) * 0.1 * (1.0 + spNoiseGet(noise1, spVec3Mul(pz, 12000.0 * scales.z), 2) * 0.1 * influences.z * highResMultiplierA)) * TERRAIN_HEIGHT_MAXISH;
 
 	value += mountainRanges * (mountainTopRoughnessMid * 0.02) * TERRAIN_HEIGHT_MAXISH * mountainSupressionA;
-	value += spNoiseGet(noise1, spVec3Mul(pz, 50000.0 * scales.z), 4) * 0.0001 * influences.z * TERRAIN_HEIGHT_MAXISH;
+	value += spNoiseGet(noise1, spVec3Mul(pz, 50000.0 * scales.z), 4) * 0.0001 * influences.z * highResMultiplierB * TERRAIN_HEIGHT_MAXISH;
 
 	value = (value + worldGenOptions.heightOffset);
 
