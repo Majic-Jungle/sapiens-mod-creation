@@ -266,7 +266,7 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 
 				if(!cliff)
 				{
-					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 2000.0);
+					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 12000.0);
 					double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
 					if(noiseValue > 0.0)
 					{
@@ -305,15 +305,15 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 
 				if(!cliff)
 				{
-					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 8000.0);
+					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 12000.0);
 					double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
 					if(noiseValue > -0.2)
 					{
-						if(noiseValue > 0.3)
+						if(noiseValue > 0.5)
 						{
 							tagsOut[tagCount++] = biomeTag_denseForest;
 						}
-						else if(noiseValue > 0.0)
+						else if(noiseValue > 0.2)
 						{
 							tagsOut[tagCount++] = biomeTag_mediumForest;
 						}
@@ -328,7 +328,7 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 					}
 
 
-					SPVec3 scaledNoiseLocB = spVec3Mul(noiseLoc, 12501.0);
+					SPVec3 scaledNoiseLocB = spVec3Mul(noiseLoc, 14501.0);
 					double noiseValueB = spNoiseGet(threadState->spNoise1, scaledNoiseLocB, 4);
 					if(temperatureSummer > noiseValueB * 4.0 + 10.0f)
 					{
