@@ -47,7 +47,8 @@ typedef uint16_t (*SPBiomeGetSurfaceTypeForPointFunc) (SPBiomeThreadState* threa
 	double altitude,
 	float steepness,
 	float riverDistance,
-	int vegetationState);
+	int vegetationState,
+	int seasonIndex);
 typedef int (*SPBiomeGetTransientGameObjectTypesForFaceSubdivisionFunc) (SPBiomeThreadState* threadState,
 	int incomingTypeCount,
 	uint16_t* types,
@@ -86,7 +87,8 @@ MJ_EXPORT uint16_t spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState
 	double altitude,
 	float steepness,
 	float riverDistance,
-	int vegetationState);
+	int vegetationState,
+	int seasonIndex);
 
 MJ_EXPORT int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* threadState,
 	int incomingTypeCount,

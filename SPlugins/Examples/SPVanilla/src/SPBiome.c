@@ -330,7 +330,7 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 
 					SPVec3 scaledNoiseLocB = spVec3Mul(noiseLoc, 14501.0);
 					double noiseValueB = spNoiseGet(threadState->spNoise1, scaledNoiseLocB, 4);
-					if(temperatureSummer > noiseValueB * 4.0 + 10.0f)
+					if(temperatureSummer > noiseValueB * 4.0 + 2.0f)
 					{
 						if(!drySummer)
 						{
@@ -381,7 +381,8 @@ uint16_t spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState,
 	double altitude,
 	float steepness,
 	float riverDistance,
-	int vegetationState)
+	int vegetationState,
+	int seasonIndex)
 {
 	SurfaceTypeInfo surfaceTypeInfo;
 	memset(&surfaceTypeInfo, 0, sizeof(surfaceTypeInfo));
@@ -505,7 +506,7 @@ uint16_t spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState,
 			{
 				return terrainType_rock;
 			}
-			if(isSecondary)
+			if(seasonIndex == 3 || (seasonIndex != 1 && isSecondary))
 			{
 				return terrainType_iceCap;
 			}
@@ -521,19 +522,33 @@ uint16_t spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState,
 			{
 				return terrainType_rock;
 			}
+
+			if(isSecondary && seasonIndex == 3)
+			{
+				return terrainType_iceCap;
+			}
+
 			if(isDirt)
 			{
 				return terrainType_dirt;
 			}
-			for(int j = 0; j < tagCount; j++)
+
+			if(seasonIndex == 2 || seasonIndex == 3)
 			{
-				/*if(tags[j] == biomeTag_coldWinter)
+				return terrainType_mediterraneanGrass;
+			}
+			else
+			{
+				for(int j = 0; j < tagCount; j++)
 				{
-					return terrainType_taigaGrass;
-				}*/
-				if(tags[j] == biomeTag_drySummer)
-				{
-					return terrainType_mediterraneanGrass;
+					/*if(tags[j] == biomeTag_coldWinter)
+					{
+						return terrainType_taigaGrass;
+					}*/
+					if(tags[j] == biomeTag_drySummer)
+					{
+						return terrainType_mediterraneanGrass;
+					}
 				}
 			}
 
