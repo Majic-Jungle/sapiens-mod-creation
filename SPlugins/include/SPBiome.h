@@ -18,12 +18,19 @@ typedef struct SPBiomeThreadState {
 
 	uint16_t (*getBiomeTag)(struct SPBiomeThreadState*,char*);
 	uint16_t (*getTerrainTypeIndex)(struct SPBiomeThreadState*,char*);
+	uint16_t (*getTerrainVariation)(struct SPBiomeThreadState*,char*);
 	uint16_t (*getGameObjectTypeIndex)(struct SPBiomeThreadState*,char*);
 
 	SPRand* spRand;
 	SPNoise* spNoise1;
 	SPNoise* spNoise2;
 } SPBiomeThreadState;
+
+
+typedef struct SPSurfaceTypeAndVariation {
+	uint16_t surfaceType;
+	uint16_t variation;
+} SPSurfaceTypeAndVariation;
 
 typedef void (* SPBiomeInitFunc) (SPBiomeThreadState* threadState);
 typedef void (* SPBiomeGetTagsForPointFunc) (SPBiomeThreadState* threadState,
@@ -38,8 +45,8 @@ typedef void (* SPBiomeGetTagsForPointFunc) (SPBiomeThreadState* threadState,
 	float temperatureWinter, 
 	float rainfallSummer, 
 	float rainfallWinter);
-typedef uint16_t (*SPBiomeGetSurfaceTypeForPointFunc) (SPBiomeThreadState* threadState, 
-	uint16_t incomingType,
+typedef SPSurfaceTypeAndVariation (*SPBiomeGetSurfaceTypeForPointFunc) (SPBiomeThreadState* threadState, 
+	SPSurfaceTypeAndVariation incomingType,
 	uint16_t* tags,
 	int tagCount,
 	SPVec3 pointNormal, 
@@ -78,8 +85,8 @@ MJ_EXPORT void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 	float rainfallSummer, 
 	float rainfallWinter);
 
-MJ_EXPORT uint16_t spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState, 
-	uint16_t incomingType,
+MJ_EXPORT SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState, 
+	SPSurfaceTypeAndVariation incomingType,
 	uint16_t* tags,
 	int tagCount,
 	SPVec3 pointNormal, 
