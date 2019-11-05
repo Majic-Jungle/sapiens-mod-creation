@@ -91,10 +91,12 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 	value *= TERRAIN_HEIGHT_MAXISH;
 
 
-	double valleyDistanceAtLowAltitudesMultiplier = fabs(spNoiseGet(noise1, spVec3Mul(pz, 40.5), 2));
-	valleyDistanceAtLowAltitudesMultiplier = spClamp(valleyDistanceAtLowAltitudesMultiplier * 4.0, 0.0, 1.0);
+	double valleyDistanceAtLowAltitudesMultiplierA = spNoiseGet(noise1, spVec3Mul(pz, 5.5), 3);
+	valleyDistanceAtLowAltitudesMultiplierA = spMax(valleyDistanceAtLowAltitudesMultiplierA, -0.2);
+	double valleyDistanceAtLowAltitudesMultiplierB = fabs(spNoiseGet(noise1, spVec3Mul(pz, 40.5), 3));
+	valleyDistanceAtLowAltitudesMultiplierB = spClamp(valleyDistanceAtLowAltitudesMultiplierB * 2.0, 0.0, 1.0);
 
-	riverDistance = riverDistance * (1.0 + spSmoothStep(0.2, 0.0, value * 4000.0) * 200.0 * valleyDistanceAtLowAltitudesMultiplier);
+	riverDistance = riverDistance * (1.0 + spSmoothStep(1.0, 0.0, value * 20000.0 + valleyDistanceAtLowAltitudesMultiplierA * 2.0) * 100.0 * valleyDistanceAtLowAltitudesMultiplierB);
 	riverDistance = spMin(riverDistance, 1.0);
 
 

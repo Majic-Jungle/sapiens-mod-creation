@@ -3,7 +3,6 @@
 #include "SPBiome.h"
 #include <string.h>
 
-static uint16_t biomeTag_cold;
 static uint16_t biomeTag_hot;
 static uint16_t biomeTag_wet;
 static uint16_t biomeTag_dry;
@@ -18,7 +17,10 @@ static uint16_t biomeTag_icecap;
 static uint16_t biomeTag_tundra;
 static uint16_t biomeTag_temperate;
 static uint16_t biomeTag_veryColdWinter;
-static uint16_t biomeTag_snowyWinter;
+static uint16_t biomeTag_heavySnowWinter;
+static uint16_t biomeTag_lightSnowWinter;
+static uint16_t biomeTag_heavySnowSummer;
+static uint16_t biomeTag_lightSnowSummer;
 static uint16_t biomeTag_drySummer;
 static uint16_t biomeTag_dryWinter;
 static uint16_t biomeTag_verySparseForest;
@@ -78,7 +80,6 @@ static uint16_t gameObjectType_smallPine;
 
 void spBiomeInit(SPBiomeThreadState* threadState)
 {
-	biomeTag_cold = threadState->getBiomeTag(threadState, "cold");
 	biomeTag_hot = threadState->getBiomeTag(threadState, "hot");
 	biomeTag_wet = threadState->getBiomeTag(threadState, "wet");
 	biomeTag_dry = threadState->getBiomeTag(threadState, "dry");
@@ -93,7 +94,10 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 	biomeTag_tundra = threadState->getBiomeTag(threadState, "tundra");
 	biomeTag_temperate = threadState->getBiomeTag(threadState, "temperate");
 	biomeTag_veryColdWinter = threadState->getBiomeTag(threadState, "veryColdWinter");
-	biomeTag_snowyWinter = threadState->getBiomeTag(threadState, "snowyWinter");
+	biomeTag_heavySnowWinter = threadState->getBiomeTag(threadState, "heavySnowWinter");
+	biomeTag_lightSnowWinter = threadState->getBiomeTag(threadState, "lightSnowWinter");
+	biomeTag_heavySnowSummer = threadState->getBiomeTag(threadState, "heavySnowSummer");
+	biomeTag_lightSnowSummer = threadState->getBiomeTag(threadState, "lightSnowSummer");
 	biomeTag_drySummer = threadState->getBiomeTag(threadState, "drySummer");
 	biomeTag_dryWinter = threadState->getBiomeTag(threadState, "dryWinter");
 	biomeTag_verySparseForest = threadState->getBiomeTag(threadState, "verySparseForest");
@@ -181,6 +185,17 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 	float averageTemp = (temperatureSummer + temperatureWinter) * 0.5f;
 	float temperatureThreshold = averageTemp * 20.0f;
 
+
+
+	SPVec3 scaledNoiseLocC = spVec3Mul(noiseLoc, 202.0);
+	double noiseValueC = spNoiseGet(threadState->spNoise1, scaledNoiseLocC, 4);
+	//double riverRainfallAddition = (1.0 - pow(riverDistance, 0.05));
+	//riverRainfallAddition = riverRainfallAddition * (0.5 + noiseValueC) * 500.0;
+	double riverRainfallAddition = (1.0 - pow(riverDistance, 0.05));
+	riverRainfallAddition = riverRainfallAddition * (1.0 + noiseValueC) * 500.0;
+
+	double annualRainfallWithRiverAddition = annualRainfall + riverRainfallAddition;
+
 	if (rainfallSummer > rainfallWinter * 2.3f)
 	{
 		temperatureThreshold = temperatureThreshold + 280.0f;
@@ -203,32 +218,51 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 		tagsOut[tagCount++] = biomeTag_river;
 	}
 
-	if (temperatureWinter < -5.0f)
+	if(averageTemp >= 18.0f)
 	{
-		tagsOut[tagCount++] = biomeTag_veryColdWinter;
+		tagsOut[tagCount++] = biomeTag_hot;
+	}
+	else
+	{
+		if(temperatureWinter < -5.0f)
+		{
+			tagsOut[tagCount++] = biomeTag_veryColdWinter;
+		}
+	
+		if(annualRainfall > temperatureThreshold * 0.5)
+		{
+			if(temperatureSummer < 8.0f)
+			{
+				if(annualRainfall > temperatureThreshold * 2.0)
+				{
+					tagsOut[tagCount++] = biomeTag_heavySnowSummer;
+				}
+				else
+				{
+					tagsOut[tagCount++] = biomeTag_lightSnowSummer;
+				}
+			}
+			else if(temperatureWinter < 8.0f)
+			{
+				if(annualRainfall > temperatureThreshold * 2.0)
+				{
+					tagsOut[tagCount++] = biomeTag_heavySnowWinter;
+				}
+				else
+				{
+					tagsOut[tagCount++] = biomeTag_lightSnowWinter;
+				}
+			}
+		}
 	}
 
 
-	if (temperatureWinter < 5.0f)
-	{
-		tagsOut[tagCount++] = biomeTag_snowyWinter;
-	}
 
-	if (annualRainfall < temperatureThreshold) // B
+	if (annualRainfallWithRiverAddition < temperatureThreshold) // B
 	{
 		tagsOut[tagCount++] = biomeTag_dry;
-		bool cold = false;
-		if (averageTemp >= 18.0f)
-		{
-			tagsOut[tagCount++] = biomeTag_hot;
-		}
-		else
-		{
-			cold = true;
-			tagsOut[tagCount++] = biomeTag_cold;
-		}
 
-		if (annualRainfall < temperatureThreshold * 0.5)
+		if (annualRainfallWithRiverAddition < temperatureThreshold * 0.5)
 		{
 			tagsOut[tagCount++] = biomeTag_desert;
 		}
@@ -236,7 +270,7 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 		{
 			tagsOut[tagCount++] = biomeTag_steppe;
 
-			if(cold && !cliff)
+			if(averageTemp < 18.0f && !cliff)
 			{
 				SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 2000.0);
 				double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
@@ -302,9 +336,6 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 			else // C or D
 			{
 				tagsOut[tagCount++] = biomeTag_temperate;
-
-
-				
 
 				bool drySummer = false;
 				if (rainfallSummer < 30.0f && rainfallSummer < rainfallWinter / 3.0f)
@@ -373,10 +404,11 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 
 typedef struct SurfaceTypeInfo {
 	bool river;
-	bool snowy;
+	bool hot;
+	int snowDepth;
 } SurfaceTypeInfo;
 
-void getSurfaceTypeInfo(uint16_t* biomeTags, int tagCount, SurfaceTypeInfo* surfaceTypeInfo)
+void getSurfaceTypeInfo(uint16_t* biomeTags, int tagCount, int seasonIndex, SurfaceTypeInfo* surfaceTypeInfo)
 {
 	for(int i = 0; i < tagCount; i++)
 	{
@@ -384,9 +416,42 @@ void getSurfaceTypeInfo(uint16_t* biomeTags, int tagCount, SurfaceTypeInfo* surf
 		{
 			surfaceTypeInfo->river = true;
 		}
-		if(biomeTags[i] == biomeTag_snowyWinter)
+		else if(biomeTags[i] == biomeTag_hot)
 		{
-			surfaceTypeInfo->snowy = true;
+			surfaceTypeInfo->hot = true;
+		}
+		else if(biomeTags[i] == biomeTag_heavySnowSummer)
+		{
+			surfaceTypeInfo->snowDepth = 2;
+		}
+		else if(biomeTags[i] == biomeTag_lightSnowSummer)
+		{
+			if(seasonIndex == 1)
+			{
+				surfaceTypeInfo->snowDepth = 1;
+			}
+			else
+			{
+				surfaceTypeInfo->snowDepth = 2;
+			}
+		}
+		else if(biomeTags[i] == biomeTag_heavySnowWinter)
+		{
+			if(seasonIndex == 0 || seasonIndex == 2)
+			{
+				surfaceTypeInfo->snowDepth = 1;
+			}
+			else if(seasonIndex == 3)
+			{
+				surfaceTypeInfo->snowDepth = 2;
+			}
+		}
+		else if(biomeTags[i] == biomeTag_lightSnowWinter)
+		{
+			if(seasonIndex == 3)
+			{
+				surfaceTypeInfo->snowDepth = 1;
+			}
 		}
 	}
 }
@@ -406,7 +471,7 @@ SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* thre
 	SurfaceTypeInfo surfaceTypeInfo;
 	SPSurfaceTypeAndVariation result = {0,0};
 	memset(&surfaceTypeInfo, 0, sizeof(surfaceTypeInfo));
-	getSurfaceTypeInfo(tags, tagCount, &surfaceTypeInfo);
+	getSurfaceTypeInfo(tags, tagCount, seasonIndex, &surfaceTypeInfo);
 
 
 	if(altitude < -0.00000001)
@@ -428,10 +493,24 @@ SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* thre
 	double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
 
 	bool isRock = (steepness > rockSteepness + noiseValue * 0.2);
-	bool isSecondary = (noiseValue > 0.0);
 	bool isDirt = (steepness > noiseValue + 0.5);
+	bool isSecondary = (noiseValue > 0.0);
 
+	bool isDefault = (!isRock && !isDirt && !isBeach);
 
+	//defaults
+
+	result.surfaceType = terrainType_dirt;
+	if(isRock)
+	{
+		result.surfaceType = terrainType_rock;
+	}
+	if(isBeach)
+	{
+		result.surfaceType = (surfaceTypeInfo.river ? terrainType_gravel : terrainType_beachSand);
+	}
+
+	//check for primary designations
 	for(int i = 0; i < tagCount; i++)
 	{
 		if(tags[i] == biomeTag_desert)
@@ -439,265 +518,107 @@ SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* thre
 			if(isRock)
 			{
 				result.surfaceType = terrainType_redRock;
-				return result;
-			}
-			for(int j = 0; j < tagCount; j++)
-			{
-				if(tags[j] == biomeTag_hot)
-				{
-					result.surfaceType =  terrainType_desertRedSand;
-					return result;
-				}
-			}
-			result.surfaceType = terrainType_desertSand;
-			return result;
-		}
-		if(tags[i] == biomeTag_steppe)
-		{
-			for(int j = 0; j < tagCount; j++)
-			{
-				if(tags[j] == biomeTag_hot)
-				{
-					if(isRock)
-					{
-						result.surfaceType = terrainType_redRock;
-						return result;
-					}
-					if(isBeach)
-					{
-						result.surfaceType = (surfaceTypeInfo.river ? terrainType_gravel : terrainType_beachSand);
-						return result;
-					}
-					if(isDirt)
-					{
-						result.surfaceType = terrainType_dirt;
-						return result;
-					}
-					result.surfaceType = terrainType_steppeMostlyDirt;
-					return result;
-				}
-				else if(surfaceTypeInfo.snowy)
-				{
-					result.variation = terrainVariation_snow;
-					if(isRock)
-					{
-						result.surfaceType = terrainType_rock;
-						return result;
-					}
-					if(seasonIndex == 3 || (seasonIndex != 1 && isSecondary))
-					{
-						result.surfaceType = terrainType_iceCap;
-						return result;
-					}
-					if(isBeach)
-					{
-						result.surfaceType = (surfaceTypeInfo.river ? terrainType_gravel : terrainType_beachSand);
-						return result;
-					}
-					if(isDirt)
-					{
-						result.surfaceType = terrainType_dirt;
-						return result;
-					}
-					result.surfaceType = terrainType_steppeMostlyGrass;
-					return result;
-				}
-			}
-			if(isRock)
-			{
-				result.surfaceType = terrainType_rock;
-				return result;
-			}
-			if(isDirt)
-			{
-				result.surfaceType = terrainType_dirt;
-				return result;
-			}
-			result.surfaceType = terrainType_steppeMostlyGrass;
-			return result;
-		}
-		if(tags[i] == biomeTag_rainforest)
-		{
-			if(isRock) 
-			{
-				result.surfaceType = terrainType_rock;
-				return result;
-			}
-			if(isBeach)
-			{
-				result.surfaceType = (surfaceTypeInfo.river ? terrainType_gravel : terrainType_beachSand);
-				return result;
-			}
-			if(isDirt)
-			{
-				result.surfaceType = terrainType_dirt;
-				return result;
-			}
-			result.surfaceType = terrainType_tropicalRainforestGrass;
-			return result;
-		}
-		if(tags[i] == biomeTag_monsoon)
-		{
-			if(isRock)
-			{
-				result.surfaceType = terrainType_rock;
-				return result;
-			}
-			if(isBeach)
-			{
-				result.surfaceType = (surfaceTypeInfo.river ? terrainType_gravel : terrainType_beachSand);
-				return result;
-			}
-			if(isDirt)
-			{
-				result.surfaceType = terrainType_dirt;
-				return result;
-			}
-			result.surfaceType = terrainType_monsoonGrass;
-			return result;
-		}
-		if(tags[i] == biomeTag_savanna)
-		{
-			if(isRock)
-			{
-				result.surfaceType = terrainType_rock;
-				return result;
-			}
-			if(isBeach)
-			{
-				result.surfaceType = (surfaceTypeInfo.river ? terrainType_gravel : terrainType_beachSand);
-				return result;
-			}
-			if(isDirt)
-			{
-				result.surfaceType = terrainType_dirt;
-				return result;
-			}
-			result.surfaceType = terrainType_savannaGrass;
-			return result;
-		}
-		if(tags[i] == biomeTag_icecap)
-		{
-			result.variation = terrainVariation_snow;
-			if(isRock)
-			{
-				result.surfaceType = terrainType_rock;
-				return result;
-			}
-			if(isDirt)
-			{
-				result.surfaceType = terrainType_dirt;
-				return result;
-			}
-			result.surfaceType = terrainType_iceCap;
-			return result;
-		}
-		if(tags[i] == biomeTag_tundra)
-		{
-			if(seasonIndex != 1)
-			{
-				result.variation = terrainVariation_snow;
-			}
-			if(isRock)
-			{
-				result.surfaceType = terrainType_rock;
-				return result;
-			}
-			if(seasonIndex == 3 || (seasonIndex != 1 && isSecondary))
-			{
-				result.surfaceType = terrainType_iceCap;
-				return result;
-			}
-			if(isBeach)
-			{
-				result.surfaceType = (surfaceTypeInfo.river ? terrainType_gravel : terrainType_beachSand);
-				return result;
-			}
-			if(isDirt)
-			{
-				result.surfaceType = terrainType_dirt;
-				return result;
-			}
-			result.surfaceType = terrainType_tundraGrass;
-			return result;
-		}
-		if(tags[i] == biomeTag_temperate)
-		{
-			if(seasonIndex == 3)
-			{
-				result.variation = terrainVariation_snow;
-			}
-
-			if(isRock)
-			{
-				result.surfaceType = terrainType_rock;
-				return result;
-			}
-
-			if(isSecondary && seasonIndex == 3)
-			{
-				result.surfaceType = terrainType_iceCap;
-				return result;
-			}
-
-			if(isBeach)
-			{
-				result.surfaceType = (surfaceTypeInfo.river ? terrainType_gravel : terrainType_beachSand);
-				return result;
-			}
-
-			if(isDirt)
-			{
-				result.surfaceType = terrainType_dirt;
-				return result;
-			}
-
-			if(seasonIndex == 2 || seasonIndex == 3)
-			{
-				result.surfaceType = terrainType_mediterraneanGrass;
-				return result;
 			}
 			else
 			{
-				for(int j = 0; j < tagCount; j++)
+				if(surfaceTypeInfo.hot)
 				{
-					/*if(tags[j] == biomeTag_coldWinter)
-					{
-						return terrainType_taigaGrass;
-					}*/
-					if(tags[j] == biomeTag_drySummer)
-					{
-						result.surfaceType = terrainType_mediterraneanGrass;
-						return result;
-					}
+					result.surfaceType =  terrainType_desertRedSand;
+				}
+				else
+				{
+					result.surfaceType = terrainType_desertSand;
 				}
 			}
+		}
+		if(tags[i] == biomeTag_steppe)
+		{
+			if(surfaceTypeInfo.hot)
+			{
+				if(isRock)
+				{
+					result.surfaceType = terrainType_redRock;
+				}
+				else if(isDefault)
+				{
+					result.surfaceType = terrainType_steppeMostlyDirt;
+				}
+			}
+			else
+			{
+				if(isDefault)
+				{
+					result.surfaceType = terrainType_steppeMostlyGrass;
+				}
+			}
+		}
+		if(tags[i] == biomeTag_rainforest)
+		{
+			if(isDefault)
+			{
+				result.surfaceType = terrainType_tropicalRainforestGrass;
+			}
+		}
+		if(tags[i] == biomeTag_monsoon)
+		{
+			if(isDefault)
+			{
+				result.surfaceType = terrainType_monsoonGrass;
+			}
+		}
+		if(tags[i] == biomeTag_savanna)
+		{
+			if(isDefault)
+			{
+				result.surfaceType = terrainType_savannaGrass;
+			}
+		}
+		if(tags[i] == biomeTag_icecap)
+		{
+			if(!isRock && !isDirt)
+			{
+				result.surfaceType = terrainType_iceCap;
+			}
+		}
+		if(tags[i] == biomeTag_tundra)
+		{
+			if(isDefault)
+			{
+				result.surfaceType = terrainType_tundraGrass;
+			}
+		}
+		if(tags[i] == biomeTag_temperate)
+		{
 
-			result.surfaceType = terrainType_temperateGrass;
-			return result;
+			if(isDefault)
+			{
+				if(seasonIndex == 0 || seasonIndex == 1)
+				{
+					result.surfaceType = terrainType_temperateGrass;
+				}
+				else if(seasonIndex == 2)
+				{
+					result.surfaceType = terrainType_mediterraneanGrass;
+				}
+				else
+				{
+					result.surfaceType = terrainType_tundraGrass;
+				}
+			}
 		}
 	}
 
+	//add snow
+	if(surfaceTypeInfo.snowDepth > 0)
+	{
+		result.variation = terrainVariation_snow;
 
-
-	if(isRock)
-	{
-		result.surfaceType = terrainType_rock;
-		return result;
-	}
-	if(isBeach)
-	{
-		result.surfaceType = (surfaceTypeInfo.river ? terrainType_gravel : terrainType_beachSand);
-		return result;
-	}
-	if(isDirt)
-	{
-		result.surfaceType = terrainType_dirt;
-		return result;
+		if(surfaceTypeInfo.snowDepth == 2 || (surfaceTypeInfo.snowDepth == 1 && isSecondary))
+		{
+			result.surfaceType = terrainType_iceCap;
+		}
 	}
 
-
-	result.surfaceType = terrainType_dirt;
 	return result;
 }
 
