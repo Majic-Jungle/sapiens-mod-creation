@@ -18,8 +18,10 @@ static uint16_t biomeTag_tundra;
 static uint16_t biomeTag_temperate;
 static uint16_t biomeTag_veryColdWinter;
 static uint16_t biomeTag_heavySnowWinter;
+static uint16_t biomeTag_medSnowWinter;
 static uint16_t biomeTag_lightSnowWinter;
 static uint16_t biomeTag_heavySnowSummer;
+static uint16_t biomeTag_medSnowSummer;
 static uint16_t biomeTag_lightSnowSummer;
 static uint16_t biomeTag_drySummer;
 static uint16_t biomeTag_dryWinter;
@@ -95,8 +97,10 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 	biomeTag_temperate = threadState->getBiomeTag(threadState, "temperate");
 	biomeTag_veryColdWinter = threadState->getBiomeTag(threadState, "veryColdWinter");
 	biomeTag_heavySnowWinter = threadState->getBiomeTag(threadState, "heavySnowWinter");
+	biomeTag_medSnowWinter = threadState->getBiomeTag(threadState, "medSnowWinter");
 	biomeTag_lightSnowWinter = threadState->getBiomeTag(threadState, "lightSnowWinter");
 	biomeTag_heavySnowSummer = threadState->getBiomeTag(threadState, "heavySnowSummer");
+	biomeTag_medSnowSummer = threadState->getBiomeTag(threadState, "medSnowSummer");
 	biomeTag_lightSnowSummer = threadState->getBiomeTag(threadState, "lightSnowSummer");
 	biomeTag_drySummer = threadState->getBiomeTag(threadState, "drySummer");
 	biomeTag_dryWinter = threadState->getBiomeTag(threadState, "dryWinter");
@@ -237,6 +241,10 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 				{
 					tagsOut[tagCount++] = biomeTag_heavySnowSummer;
 				}
+				else if(annualRainfall > temperatureThreshold)
+				{
+					tagsOut[tagCount++] = biomeTag_medSnowSummer;
+				}
 				else
 				{
 					tagsOut[tagCount++] = biomeTag_lightSnowSummer;
@@ -247,6 +255,10 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 				if(annualRainfall > temperatureThreshold * 2.0)
 				{
 					tagsOut[tagCount++] = biomeTag_heavySnowWinter;
+				}
+				else if(annualRainfall > temperatureThreshold)
+				{
+					tagsOut[tagCount++] = biomeTag_medSnowWinter;
 				}
 				else
 				{
@@ -422,20 +434,35 @@ void getSurfaceTypeInfo(uint16_t* biomeTags, int tagCount, int seasonIndex, Surf
 		}
 		else if(biomeTags[i] == biomeTag_heavySnowSummer)
 		{
-			surfaceTypeInfo->snowDepth = 2;
+			surfaceTypeInfo->snowDepth = 3;
 		}
-		else if(biomeTags[i] == biomeTag_lightSnowSummer)
+		else if(biomeTags[i] == biomeTag_medSnowSummer)
+		{
+			if(seasonIndex == 1)
+			{
+				surfaceTypeInfo->snowDepth = 2;
+			}
+			else
+			{
+				surfaceTypeInfo->snowDepth = 3;
+			}
+		}
+		else if(biomeTags[i] == biomeTag_lightSnowSummer || biomeTags[i] == biomeTag_heavySnowWinter)
 		{
 			if(seasonIndex == 1)
 			{
 				surfaceTypeInfo->snowDepth = 1;
 			}
-			else
+			else if(seasonIndex == 0 || seasonIndex == 2)
 			{
 				surfaceTypeInfo->snowDepth = 2;
 			}
+			else
+			{
+				surfaceTypeInfo->snowDepth = 3;
+			}
 		}
-		else if(biomeTags[i] == biomeTag_heavySnowWinter)
+		else if(biomeTags[i] == biomeTag_medSnowWinter)
 		{
 			if(seasonIndex == 0 || seasonIndex == 2)
 			{
@@ -466,7 +493,8 @@ SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* thre
 	float steepness,
 	float riverDistance,
 	int vegetationState,
-	int seasonIndex)
+	int seasonIndex,
+	float seasonTransitionFraction)
 {
 	SurfaceTypeInfo surfaceTypeInfo;
 	SPSurfaceTypeAndVariation result = {0,0};
@@ -489,7 +517,7 @@ SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* thre
 	}
 
 
-	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 599999.0);
+	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 59999.0);
 	double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
 
 	bool isRock = (steepness > rockSteepness + noiseValue * 0.2);
@@ -611,11 +639,18 @@ SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* thre
 	//add snow
 	if(surfaceTypeInfo.snowDepth > 0)
 	{
-		result.variation = terrainVariation_snow;
-
-		if(surfaceTypeInfo.snowDepth == 2 || (surfaceTypeInfo.snowDepth == 1 && isSecondary))
+		if(surfaceTypeInfo.snowDepth == 3)
 		{
 			result.surfaceType = terrainType_iceCap;
+			result.variation = terrainVariation_snow;
+		}
+		else if((noiseValue > -0.1))// + seasonTransitionFraction)) //todo lol
+		{
+			if(surfaceTypeInfo.snowDepth == 2 || (noiseValue > 0.3))// + seasonTransitionFraction))
+			{
+				result.surfaceType = terrainType_iceCap;
+				result.variation = terrainVariation_snow;
+			}
 		}
 	}
 
