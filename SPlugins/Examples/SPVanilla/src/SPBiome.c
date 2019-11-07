@@ -447,7 +447,7 @@ void getSurfaceTypeInfo(uint16_t* biomeTags, int tagCount, int seasonIndex, Surf
 				surfaceTypeInfo->snowDepth = 3;
 			}
 		}
-		else if(biomeTags[i] == biomeTag_lightSnowSummer || biomeTags[i] == biomeTag_heavySnowWinter)
+		else if(biomeTags[i] == biomeTag_lightSnowSummer)
 		{
 			if(seasonIndex == 1)
 			{
@@ -462,13 +462,20 @@ void getSurfaceTypeInfo(uint16_t* biomeTags, int tagCount, int seasonIndex, Surf
 				surfaceTypeInfo->snowDepth = 3;
 			}
 		}
-		else if(biomeTags[i] == biomeTag_medSnowWinter)
+		else if(biomeTags[i] == biomeTag_heavySnowWinter)
 		{
 			if(seasonIndex == 0 || seasonIndex == 2)
 			{
-				surfaceTypeInfo->snowDepth = 1;
+				surfaceTypeInfo->snowDepth = 2;
 			}
 			else if(seasonIndex == 3)
+			{
+				surfaceTypeInfo->snowDepth = 3;
+			}
+		}
+		else if(biomeTags[i] == biomeTag_medSnowWinter)
+		{
+			if(seasonIndex == 3)
 			{
 				surfaceTypeInfo->snowDepth = 2;
 			}
@@ -493,8 +500,7 @@ SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* thre
 	float steepness,
 	float riverDistance,
 	int vegetationState,
-	int seasonIndex,
-	float seasonTransitionFraction)
+	int seasonIndex)
 {
 	SurfaceTypeInfo surfaceTypeInfo;
 	SPSurfaceTypeAndVariation result = {0,0};
@@ -644,9 +650,9 @@ SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* thre
 			result.surfaceType = terrainType_iceCap;
 			result.variation = terrainVariation_snow;
 		}
-		else if((noiseValue > -0.1))// + seasonTransitionFraction)) //todo lol
+		else if((noiseValue > -0.1))
 		{
-			if(surfaceTypeInfo.snowDepth == 2 || (noiseValue > 0.3))// + seasonTransitionFraction))
+			if(surfaceTypeInfo.snowDepth == 2 || (noiseValue > 0.3))
 			{
 				result.surfaceType = terrainType_iceCap;
 				result.variation = terrainVariation_snow;
