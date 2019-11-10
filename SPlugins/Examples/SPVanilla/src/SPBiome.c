@@ -69,7 +69,7 @@ static uint16_t gameObjectType_smallRock;
 static uint16_t gameObjectType_birchBranch;
 static uint16_t gameObjectType_pineBranch;
 
-#define BIRCH_TYPE_COUNT 7
+#define BIRCH_TYPE_COUNT 6
 static uint16_t gameObjectType_birchTypes[BIRCH_TYPE_COUNT];
 
 #define MED_PINE_TYPE_COUNT 2
@@ -157,8 +157,7 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 		gameObjectType_birchTypes[2] = threadState->getGameObjectTypeIndex(threadState, "birch3");
 		gameObjectType_birchTypes[3] = threadState->getGameObjectTypeIndex(threadState, "birch4");
 		gameObjectType_birchTypes[4] = threadState->getGameObjectTypeIndex(threadState, "aspen1");
-		gameObjectType_birchTypes[5] = threadState->getGameObjectTypeIndex(threadState, "aspenBaby1");
-		gameObjectType_birchTypes[6] = threadState->getGameObjectTypeIndex(threadState, "aspen2");
+		gameObjectType_birchTypes[5] = threadState->getGameObjectTypeIndex(threadState, "aspen2");
 
 		gameObjectType_willowTypes[0] = threadState->getGameObjectTypeIndex(threadState, "willow1");
 		gameObjectType_willowTypes[1] = threadState->getGameObjectTypeIndex(threadState, "willow2");
