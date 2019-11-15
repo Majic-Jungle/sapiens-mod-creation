@@ -232,7 +232,7 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 
 				state.p = spVec3Mul(normalizedPos, posLength + SP_METERS_TO_PRERENDER(0.2));
 
-				state.particleTextureType = 2;
+				state.particleTextureType = ((spRandGetValue(spRand) > 0.5) ? 2 : 5);
 				state.lifeLeft = 1.0;
 				state.scale = 0.2 + spRandGetValue(spRand) * 0.2;
 				state.randomValueA = spRandGetValue(spRand);
@@ -243,7 +243,7 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 				double noiseValueB = spNoiseGet(threadState->spNoise, lookupB, 2);
 				double noiseValueC = spNoiseGet(threadState->spNoise, lookupC, 2);
 
-				state.v = spVec3Mul(normalizedPos, SP_METERS_TO_PRERENDER(0.9 + noiseValueC) * 0.5);
+				state.v = spVec3Mul(normalizedPos, SP_METERS_TO_PRERENDER(0.9 + noiseValueC) * 0.7);
 
 				state.gravity = spVec3Mul(spMat3GetRow(emitterState->rot, 0), SP_METERS_TO_PRERENDER(noiseValue) * 0.5);
 				state.gravity = spVec3Add(state.gravity, spVec3Mul(spMat3GetRow(emitterState->rot, 2), SP_METERS_TO_PRERENDER(noiseValueB) * 0.5));
@@ -270,7 +270,7 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 					scaleAverage,
 					randPosVec);
 
-				emitterState->counters[1] = 5 + (uint8_t)(10 * spRandGetValue(spRand));
+				emitterState->counters[1] = 2 + (uint8_t)(10 * spRandGetValue(spRand));
 
 			}
 			else
@@ -289,7 +289,7 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 					scaleAverage,
 					randPosVec);
 
-				emitterState->counters[2] = 5 + (uint8_t)(10 * spRandGetValue(spRand));
+				emitterState->counters[2] = 2 + (uint8_t)(10 * spRandGetValue(spRand));
 
 			}
 			else
@@ -308,7 +308,7 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 					scaleAverage,
 					randPosVec);
 
-				emitterState->counters[3] = 5 + (uint8_t)(10 * spRandGetValue(spRand));
+				emitterState->counters[3] = 2 + (uint8_t)(10 * spRandGetValue(spRand));
 			}
 			else 
 			{
