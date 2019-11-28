@@ -59,8 +59,8 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 
 
 	double mountainSupressionBaseA = spNoiseGet(noise2, spVec3Mul(p, 9.0 * scaleYMultiplier), 6) * influences.y;
-	double mountainSupressionBaseB = spNoiseGet(noise2, spVec3Mul(p, 500.0 * scaleYMultiplier), 4) * influences.y;
-	double mountainSupressionBaseC = spNoiseGet(noise2, spVec3Mul(p, 120.0 * scaleYMultiplier), 4) * influences.y;
+	double mountainSupressionBaseB = spNoiseGet(noise2, spVec3Mul(p, 50.0 * (scaleYMultiplier + 2.0)), 4) * (influences.y + 1.0) * 4.0;
+	double mountainSupressionBaseC = spNoiseGet(noise2, spVec3Mul(p, 60.0 * scaleYMultiplier), 4) * influences.y * 2.0;
 	double mountainSupressionA = spMax(mountainSupressionBaseA, 0.0);
 	mountainSupressionA = mountainSupressionA + 0.05;
 	double mountainSupressionB = spMax(mountainSupressionBaseB, 0.05);
