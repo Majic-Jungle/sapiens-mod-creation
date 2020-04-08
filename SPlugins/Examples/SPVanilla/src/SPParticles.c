@@ -230,12 +230,17 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 				SPVec3 normalizedPos = spVec3Div(emitterState->p, posLength);
 				SPParticleState state;
 
-				state.p = spVec3Mul(normalizedPos, posLength + SP_METERS_TO_PRERENDER(0.2));
+
+				SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(0.1));
+				randPosVec = spVec3Add(randPosVec, spVec3Mul(normalizedPos, posLength + SP_METERS_TO_PRERENDER(0.4)));
+
+				state.p = randPosVec;
 
 				state.particleTextureType = ((spRandGetValue(spRand) > 0.5) ? 2 : 5);
 				state.lifeLeft = 1.0;
 				state.scale = 0.2 + spRandGetValue(spRand) * 0.2;
 				state.randomValueA = spRandGetValue(spRand);
+				state.randomValueB = spRandGetValue(spRand);
 				SPVec3 lookup = {(normalizedPos.x + 1.2) * 99999.9, (normalizedPos.y * 4.5 + normalizedPos.z + 2.4) * 99999.9, emitterState->timeAccumulatorB * 0.1};
 				SPVec3 lookupB = {(normalizedPos.x + 1.4) * 99999.9, (normalizedPos.y * 4.6 + normalizedPos.z + 2.8) * 99999.9, emitterState->timeAccumulatorB * 0.1};
 				SPVec3 lookupC = {(normalizedPos.x + 1.8) * 99999.9, (normalizedPos.y * 4.8 + normalizedPos.z + 2.9) * 99999.9, emitterState->timeAccumulatorB * 0.5};
@@ -253,7 +258,7 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 					sp_vanillaRenderGroupSmoke,
 					&state);
 
-				emitterState->counters[0] = 1 + (uint8_t)(20 * (1.0 - noiseValueC));
+				emitterState->counters[0] = 1 + (uint8_t)(4 * (1.0 - noiseValueC));
 			}
 			else
 			{
@@ -365,7 +370,7 @@ bool spUpdateParticle(SPParticleThreadState* threadState,
 
 	if(localRenderGroupTypeID == sp_vanillaRenderGroupSmoke)
 	{
-		lifeLeftMultiplier = 0.05;
+		lifeLeftMultiplier = 0.05 + particleState->randomValueB * 0.1;
 	}
 	else if(localRenderGroupTypeID == sp_vanillaRenderGroupFire)
 	{
