@@ -63,6 +63,7 @@ static uint16_t gameObjectType_sunflower;
 static uint16_t gameObjectType_raspberryBush;
 static uint16_t gameObjectType_gooseberryBush;
 static uint16_t gameObjectType_tallPine;
+static uint16_t gameObjectType_beetrootPlant;
 
 static uint16_t gameObjectType_rock;
 static uint16_t gameObjectType_smallRock;
@@ -146,6 +147,7 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 		gameObjectType_sunflower = threadState->getGameObjectTypeIndex(threadState, "sunflower");
 		gameObjectType_raspberryBush = threadState->getGameObjectTypeIndex(threadState, "raspberryBush");
 		gameObjectType_gooseberryBush = threadState->getGameObjectTypeIndex(threadState, "gooseberryBush");
+		gameObjectType_beetrootPlant = threadState->getGameObjectTypeIndex(threadState, "beetrootPlant");
 
 		gameObjectType_rock = threadState->getGameObjectTypeIndex(threadState, "rock");
 		gameObjectType_smallRock = threadState->getGameObjectTypeIndex(threadState, "smallRock");
@@ -968,7 +970,7 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 						}
 						else if(noiseValue < -0.4)
 						{
-							int objectCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 235432, 10) - 8;
+							int objectCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 235432, 16) - 12;
 							for(int i = 0; i < objectCount; i++)
 							{
 								ADD_OBJECT(gameObjectType_raspberryBush);
@@ -983,6 +985,14 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 							for(int i = 0; i < objectCount; i++)
 							{
 								ADD_OBJECT(gameObjectType_gooseberryBush);
+							}
+						}
+						else if(noiseValue < -0.4)
+						{
+							int objectCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 235432, 16) - 12;
+							for(int i = 0; i < objectCount; i++)
+							{
+								ADD_OBJECT(gameObjectType_beetrootPlant);
 							}
 						}
 					}
