@@ -34,52 +34,54 @@ static uint16_t biomeTag_birch;
 static uint16_t biomeTag_cliff;
 static uint16_t biomeTag_river;
 
-static uint16_t terrainType_tundraGrass;
-static uint16_t terrainType_rock;
-static uint16_t terrainType_beachSand;
-static uint16_t terrainType_gravel;
-static uint16_t terrainType_water;
-static uint16_t terrainType_desertSand;
-static uint16_t terrainType_steppeMostlyGrass;
-static uint16_t terrainType_steppeMostlyDirt;
-static uint16_t terrainType_tropicalRainforestGrass;
-static uint16_t terrainType_monsoonGrass;
-static uint16_t terrainType_savannaGrass;
-static uint16_t terrainType_iceCap;
-static uint16_t terrainType_desertRedSand;
-static uint16_t terrainType_taigaGrass;
-static uint16_t terrainType_mediterraneanGrass;
-static uint16_t terrainType_temperateGrass;
-static uint16_t terrainType_redRock;
-static uint16_t terrainType_dirt;
+static uint32_t terrainBaseType_rock;
+static uint32_t terrainBaseType_beachSand;
+static uint32_t terrainBaseType_gravel;
+static uint32_t terrainBaseType_desertSand;
+static uint32_t terrainBaseType_ice;
+static uint32_t terrainBaseType_desertRedSand;
+static uint32_t terrainBaseType_redRock;
+static uint32_t terrainBaseType_dirt;
 
-static uint16_t terrainVariation_snow;
+static uint32_t terrainVariation_snow;
+static uint32_t terrainVariation_temperateGrass;
+static uint32_t terrainVariation_taigaGrass;
+static uint32_t terrainVariation_mediterraneanGrass;
+static uint32_t terrainVariation_steppeGrass;
+static uint32_t terrainVariation_tropicalRainforestGrass;
+static uint32_t terrainVariation_monsoonGrass;
+static uint32_t terrainVariation_savannaGrass;
+static uint32_t terrainVariation_tundraGrass;
 
-static uint16_t gameObjectType_appleTree;
-static uint16_t gameObjectType_orangeTree;
-static uint16_t gameObjectType_peachTree;
-static uint16_t gameObjectType_aspen3;
-static uint16_t gameObjectType_sunflower;
-static uint16_t gameObjectType_raspberryBush;
-static uint16_t gameObjectType_gooseberryBush;
-static uint16_t gameObjectType_tallPine;
-static uint16_t gameObjectType_beetrootPlant;
+static uint32_t terrainModifcation_snowRemoved;
+static uint32_t terrainModifcation_vegetationRemoved;
+static uint32_t terrainModifcation_vegetationAdded;
 
-static uint16_t gameObjectType_rock;
-static uint16_t gameObjectType_smallRock;
-static uint16_t gameObjectType_birchBranch;
-static uint16_t gameObjectType_pineBranch;
+static uint32_t gameObjectType_appleTree;
+static uint32_t gameObjectType_orangeTree;
+static uint32_t gameObjectType_peachTree;
+static uint32_t gameObjectType_aspen3;
+static uint32_t gameObjectType_sunflower;
+static uint32_t gameObjectType_raspberryBush;
+static uint32_t gameObjectType_gooseberryBush;
+static uint32_t gameObjectType_tallPine;
+static uint32_t gameObjectType_beetrootPlant;
+
+static uint32_t gameObjectType_rock;
+static uint32_t gameObjectType_smallRock;
+static uint32_t gameObjectType_birchBranch;
+static uint32_t gameObjectType_pineBranch;
 
 #define BIRCH_TYPE_COUNT 6
-static uint16_t gameObjectType_birchTypes[BIRCH_TYPE_COUNT];
+static uint32_t gameObjectType_birchTypes[BIRCH_TYPE_COUNT];
 
 #define MED_PINE_TYPE_COUNT 2
-static uint16_t gameObjectType_medPineTypes[MED_PINE_TYPE_COUNT];
+static uint32_t gameObjectType_medPineTypes[MED_PINE_TYPE_COUNT];
 
 #define WILLOW_TYPE_COUNT 2
-static uint16_t gameObjectType_willowTypes[WILLOW_TYPE_COUNT];
+static uint32_t gameObjectType_willowTypes[WILLOW_TYPE_COUNT];
 
-static uint16_t gameObjectType_smallPine;
+static uint32_t gameObjectType_smallPine;
 
 void spBiomeInit(SPBiomeThreadState* threadState)
 {
@@ -113,29 +115,29 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 	biomeTag_birch = threadState->getBiomeTag(threadState, "birch");
 	biomeTag_cliff = threadState->getBiomeTag(threadState, "cliff");
 	biomeTag_river = threadState->getBiomeTag(threadState, "river");
-	
 
-	terrainType_tundraGrass = threadState->getTerrainTypeIndex(threadState, "tundraGrass");
-	terrainType_rock = threadState->getTerrainTypeIndex(threadState, "rock");
-	terrainType_beachSand = threadState->getTerrainTypeIndex(threadState, "beachSand");
-	terrainType_gravel = threadState->getTerrainTypeIndex(threadState, "gravel");
-	terrainType_water = threadState->getTerrainTypeIndex(threadState, "water");
-	terrainType_desertSand = threadState->getTerrainTypeIndex(threadState, "desertSand");
-	terrainType_steppeMostlyGrass = threadState->getTerrainTypeIndex(threadState, "steppeMostlyGrass");
-	terrainType_steppeMostlyDirt = threadState->getTerrainTypeIndex(threadState, "steppeMostlyDirt");
-	terrainType_tundraGrass = threadState->getTerrainTypeIndex(threadState, "tundraGrass");
-	terrainType_tropicalRainforestGrass = threadState->getTerrainTypeIndex(threadState, "tropicalRainforestGrass");
-	terrainType_monsoonGrass = threadState->getTerrainTypeIndex(threadState, "monsoonGrass");
-	terrainType_savannaGrass = threadState->getTerrainTypeIndex(threadState, "savannaGrass");
-	terrainType_iceCap = threadState->getTerrainTypeIndex(threadState, "iceCap");
-	terrainType_desertRedSand = threadState->getTerrainTypeIndex(threadState, "desertRedSand");
-	terrainType_taigaGrass = threadState->getTerrainTypeIndex(threadState, "taigaGrass");
-	terrainType_mediterraneanGrass = threadState->getTerrainTypeIndex(threadState, "mediterraneanGrass");
-	terrainType_temperateGrass = threadState->getTerrainTypeIndex(threadState, "temperateGrass");
-	terrainType_redRock = threadState->getTerrainTypeIndex(threadState, "redRock");
-	terrainType_dirt = threadState->getTerrainTypeIndex(threadState, "dirt");
-
-	terrainVariation_snow = threadState->getTerrainVariation(threadState, "snow");
+	terrainBaseType_rock						= threadState->getTerrainBaseTypeIndex(threadState, "rock");
+	terrainBaseType_beachSand					= threadState->getTerrainBaseTypeIndex(threadState, "beachSand");
+	terrainBaseType_gravel						= threadState->getTerrainBaseTypeIndex(threadState, "gravel");
+	terrainBaseType_desertSand					= threadState->getTerrainBaseTypeIndex(threadState, "desertSand");
+	terrainBaseType_ice							= threadState->getTerrainBaseTypeIndex(threadState, "ice");
+	terrainBaseType_desertRedSand				= threadState->getTerrainBaseTypeIndex(threadState, "desertRedSand");
+	terrainBaseType_redRock						= threadState->getTerrainBaseTypeIndex(threadState, "redRock");
+	terrainBaseType_dirt						= threadState->getTerrainBaseTypeIndex(threadState, "dirt");
+												
+	terrainVariation_snow						= threadState->getTerrainVariation(threadState, "snow");
+	terrainVariation_temperateGrass				= threadState->getTerrainVariation(threadState, "temperateGrass");
+	terrainVariation_taigaGrass					= threadState->getTerrainVariation(threadState, "taigaGrass");
+	terrainVariation_mediterraneanGrass			= threadState->getTerrainVariation(threadState, "mediterraneanGrass");
+	terrainVariation_steppeGrass				= threadState->getTerrainVariation(threadState, "steppeGrass");
+	terrainVariation_tropicalRainforestGrass	= threadState->getTerrainVariation(threadState, "tropicalRainforestGrass");
+	terrainVariation_monsoonGrass				= threadState->getTerrainVariation(threadState, "monsoonGrass");
+	terrainVariation_savannaGrass				= threadState->getTerrainVariation(threadState, "savannaGrass");
+	terrainVariation_tundraGrass				= threadState->getTerrainVariation(threadState, "tundraGrass");
+												
+	terrainModifcation_snowRemoved				= threadState->getTerrainModification(threadState, "snowRemoved");
+	terrainModifcation_vegetationRemoved		= threadState->getTerrainModification(threadState, "vegetationRemoved");
+	terrainModifcation_vegetationAdded			= threadState->getTerrainModification(threadState, "vegetationAdded");
 
 	if(threadState->getGameObjectTypeIndex) //this function isn't set where game object types aren't required eg. in the initial world creation screen
 	{
@@ -491,41 +493,69 @@ void getSurfaceTypeInfo(uint16_t* biomeTags, int tagCount, int seasonIndex, Surf
 	}
 }
 
-SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState,
-	SPSurfaceTypeAndVariation incomingType,
+uint32_t getBeachSurfaceType(SurfaceTypeInfo* surfaceTypeInfo, float riverDistance, float noiseValue)
+{
+	if(surfaceTypeInfo->river)
+	{
+		if(riverDistance < (noiseValue * 0.01 + 0.005))
+		{
+			return terrainBaseType_gravel;
+		}
+		else
+		{
+			return terrainBaseType_beachSand;
+		}
+	}
+
+	return (noiseValue > 0.1 ? terrainBaseType_gravel : terrainBaseType_beachSand);
+}
+
+SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState,
+	SPSurfaceTypeResult incomingType,
 	uint16_t* tags,
 	int tagCount,
-	SPVec3 pointNormal,
-	SPVec3 noiseLoc,
+	uint32_t* modifications,
+	int modificationCount,
+	uint32_t fillGameObjectTypeIndex,
+	int16_t digFillOffset,
+	uint32_t* variations,
+	SPVec3 pointNormal, 
+	SPVec3 noiseLoc, 
 	double altitude,
 	float steepness,
 	float riverDistance,
-	int vegetationState,
 	int seasonIndex)
 {
 	SurfaceTypeInfo surfaceTypeInfo;
-	SPSurfaceTypeAndVariation result = {0,0};
+	SPSurfaceTypeResult result = incomingType;
 	memset(&surfaceTypeInfo, 0, sizeof(surfaceTypeInfo));
 	getSurfaceTypeInfo(tags, tagCount, seasonIndex, &surfaceTypeInfo);
 
+	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 59999.0);
+	double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
 
 	if(altitude < -0.00000001)
 	{
-		result.surfaceType = (surfaceTypeInfo.river ? terrainType_gravel : terrainType_beachSand);
+		result.surfaceBaseType = getBeachSurfaceType(&surfaceTypeInfo, riverDistance, noiseValue);
+		result.materialIndex = threadState->getMaterialTypeIndexForBaseType(threadState, result.surfaceBaseType);
 		return result;
 	}
 
-	bool isBeach = (altitude < 0.0000001);
+	bool isBeach = ((altitude + noiseValue * 0.00000005) < 0.0000001);
+	bool snowRemoved = false;
+	bool vegetationRemoved = false;
 
-	if(vegetationState == 1)
+	for(int i = 0; i < modificationCount; i++)
 	{
-		result.surfaceType = terrainType_dirt;
-		return result;
+		if(modifications[i] == terrainModifcation_snowRemoved)
+		{
+			snowRemoved = true;
+		}
+		else if(modifications[i] == terrainModifcation_vegetationRemoved)
+		{
+			vegetationRemoved = true;
+		}
 	}
-
-
-	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 59999.0);
-	double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
 
 	bool isRock = (steepness > rockSteepness + noiseValue * 0.2);
 	bool isDirt = (steepness > noiseValue + 0.5);
@@ -535,15 +565,17 @@ SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* thre
 
 	//defaults
 
-	result.surfaceType = terrainType_dirt;
+	result.surfaceBaseType = terrainBaseType_dirt;
 	if(isRock)
 	{
-		result.surfaceType = terrainType_rock;
+		result.surfaceBaseType = terrainBaseType_rock;
 	}
 	if(isBeach)
 	{
-		result.surfaceType = (surfaceTypeInfo.river ? terrainType_gravel : terrainType_beachSand);
+		result.surfaceBaseType = getBeachSurfaceType(&surfaceTypeInfo, riverDistance, noiseValue);
 	}
+
+	uint32_t grassVariation = 0;
 
 	//check for primary designations
 	for(int i = 0; i < tagCount; i++)
@@ -552,17 +584,17 @@ SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* thre
 		{
 			if(isRock)
 			{
-				result.surfaceType = terrainType_redRock;
+				result.surfaceBaseType = terrainBaseType_redRock;
 			}
 			else
 			{
 				if(surfaceTypeInfo.hot)
 				{
-					result.surfaceType =  terrainType_desertRedSand;
+					result.surfaceBaseType =  terrainBaseType_desertRedSand;
 				}
 				else
 				{
-					result.surfaceType = terrainType_desertSand;
+					result.surfaceBaseType = terrainBaseType_desertSand;
 				}
 			}
 		}
@@ -572,18 +604,19 @@ SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* thre
 			{
 				if(isRock)
 				{
-					result.surfaceType = terrainType_redRock;
+					result.surfaceBaseType = terrainBaseType_redRock;
 				}
 				else if(isDefault)
 				{
-					result.surfaceType = terrainType_steppeMostlyDirt;
+					result.surfaceBaseType = terrainBaseType_dirt;
 				}
 			}
 			else
 			{
 				if(isDefault)
 				{
-					result.surfaceType = terrainType_steppeMostlyGrass;
+					result.surfaceBaseType = terrainBaseType_dirt;
+					grassVariation = terrainVariation_steppeGrass;
 				}
 			}
 		}
@@ -591,35 +624,39 @@ SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* thre
 		{
 			if(isDefault)
 			{
-				result.surfaceType = terrainType_tropicalRainforestGrass;
+				result.surfaceBaseType = terrainBaseType_dirt;
+				grassVariation = terrainVariation_tropicalRainforestGrass;
 			}
 		}
 		if(tags[i] == biomeTag_monsoon)
 		{
 			if(isDefault)
 			{
-				result.surfaceType = terrainType_monsoonGrass;
+				result.surfaceBaseType = terrainBaseType_dirt;
+				grassVariation = terrainVariation_monsoonGrass;
 			}
 		}
 		if(tags[i] == biomeTag_savanna)
 		{
 			if(isDefault)
 			{
-				result.surfaceType = terrainType_savannaGrass;
+				result.surfaceBaseType = terrainBaseType_dirt;
+				grassVariation = terrainVariation_savannaGrass;
 			}
 		}
 		if(tags[i] == biomeTag_icecap)
 		{
 			if(!isRock && !isDirt)
 			{
-				result.surfaceType = terrainType_iceCap;
+				result.surfaceBaseType = terrainBaseType_ice;
 			}
 		}
 		if(tags[i] == biomeTag_tundra)
 		{
 			if(isDefault)
 			{
-				result.surfaceType = terrainType_tundraGrass;
+				result.surfaceBaseType = terrainBaseType_dirt;
+				grassVariation = terrainVariation_tundraGrass;
 			}
 		}
 		if(tags[i] == biomeTag_temperate)
@@ -627,38 +664,75 @@ SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* thre
 
 			if(isDefault)
 			{
+				result.surfaceBaseType = terrainBaseType_dirt;
 				if(seasonIndex == 0 || seasonIndex == 1)
 				{
-					result.surfaceType = terrainType_temperateGrass;
+					grassVariation = terrainVariation_temperateGrass;
 				}
 				else if(seasonIndex == 2)
 				{
-					result.surfaceType = terrainType_mediterraneanGrass;
+					grassVariation = terrainVariation_mediterraneanGrass;
 				}
 				else
 				{
-					result.surfaceType = terrainType_tundraGrass;
+					grassVariation = terrainVariation_tundraGrass;
 				}
 			}
 		}
 	}
 
+	bool hasSnow = false;
+
 	//add snow
-	if(surfaceTypeInfo.snowDepth > 0)
+	if(!snowRemoved && surfaceTypeInfo.snowDepth > 0)
 	{
 		if(surfaceTypeInfo.snowDepth == 3)
 		{
-			result.surfaceType = terrainType_iceCap;
-			result.variation = terrainVariation_snow;
+			hasSnow = true;
 		}
 		else if((noiseValue > -0.1))
 		{
 			if(surfaceTypeInfo.snowDepth == 2 || (noiseValue > 0.3))
 			{
-				result.surfaceType = terrainType_iceCap;
-				result.variation = terrainVariation_snow;
+				hasSnow = true;
 			}
 		}
+	}
+
+	if(vegetationRemoved)
+	{
+		grassVariation = 0;
+	}
+
+	if(grassVariation != 0)
+	{
+		variations[result.variationCount++] = grassVariation;
+	}
+	if(hasSnow)
+	{
+		variations[result.variationCount++] = terrainVariation_snow;
+	}
+
+	if(result.variationCount > 0)
+	{
+		result.materialIndex = threadState->getMaterialTypeIndexForVariationType(threadState, variations[result.variationCount - 1]);
+		result.decalTypeIndex = threadState->getDecalGroupTypeIndexForVariationType(threadState, variations[result.variationCount - 1]);
+
+		//result.decalTypeIndex = threadState->getDecalGroupTypeIndexForBaseType(threadState, result.surfaceBaseType);
+
+		/*if(grassVariation)
+		{
+			result.decalTypeIndex = threadState->getDecalGroupTypeIndexForVariationType(threadState, grassVariation);
+		}
+		else
+		{
+			result.decalTypeIndex = threadState->getDecalGroupTypeIndexForBaseType(threadState, result.surfaceBaseType);
+		}*/
+	}
+	else
+	{
+		result.materialIndex = threadState->getMaterialTypeIndexForBaseType(threadState, result.surfaceBaseType);
+		result.decalTypeIndex = threadState->getDecalGroupTypeIndexForBaseType(threadState, result.surfaceBaseType);
 	}
 
 	return result;
@@ -740,7 +814,7 @@ if(addedCount >= BIOME_MAX_GAME_OBJECT_COUNT_PER_SUBDIVISION)\
 	return addedCount;\
 }
 
-uint16_t getPineType(uint64_t faceUniqueID, int i)
+uint32_t getPineType(uint64_t faceUniqueID, int i)
 {
 	if(spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 22245 + i, 12) == 1)
 	{
@@ -749,17 +823,17 @@ uint16_t getPineType(uint64_t faceUniqueID, int i)
 	return gameObjectType_medPineTypes[spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3434 + i, MED_PINE_TYPE_COUNT)];
 }
 
-uint16_t getBirchType(uint64_t faceUniqueID, int i)
+uint32_t getBirchType(uint64_t faceUniqueID, int i)
 {
 	return gameObjectType_birchTypes[spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3434 + i, BIRCH_TYPE_COUNT)];
 }
 
-uint16_t getWillowType(uint64_t faceUniqueID, int i)
+uint32_t getWillowType(uint64_t faceUniqueID, int i)
 {
 	return gameObjectType_willowTypes[spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3434 + i, WILLOW_TYPE_COUNT)];
 }
 
-uint16_t getTreeType(uint64_t faceUniqueID, int i, ForestInfo* forestInfo)
+uint32_t getTreeType(uint64_t faceUniqueID, int i, ForestInfo* forestInfo)
 {
 	if(forestInfo->river)
 	{
@@ -789,7 +863,7 @@ uint16_t getTreeType(uint64_t faceUniqueID, int i, ForestInfo* forestInfo)
 
 int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* threadState,
 	int incomingTypeCount,
-	uint16_t* types,
+	uint32_t* types,
 	uint16_t* biomeTags,
 	int tagCount,
 	SPVec3 pointNormal, 
@@ -798,7 +872,9 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 	int level, 
 	double altitude, 
 	float steepness,
-	uint16_t terrainType, 
+	uint32_t terrainBaseType, 
+	uint32_t* variations,
+	int variationCount,
 	float riverDistance)
 {
 	int addedCount = incomingTypeCount;
@@ -1008,7 +1084,7 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 200.0);
 					double rawValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 3);
 					double rangedFractionValue = rawValue * rawValue * 8.0;
-					if(terrainType == terrainType_gravel)
+					if(terrainBaseType == terrainBaseType_gravel)
 					{
 						rangedFractionValue += 1.0;
 					}
@@ -1044,7 +1120,7 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 2000.0);
 					double rawValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 3);
 					double rangedFractionValue = rawValue * rawValue * 8.0;
-					if(terrainType == terrainType_gravel)
+					if(terrainBaseType == terrainBaseType_gravel)
 					{
 						rangedFractionValue += 1.0;
 					}

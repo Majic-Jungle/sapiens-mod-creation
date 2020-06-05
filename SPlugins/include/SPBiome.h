@@ -8,6 +8,8 @@
 #include "SPRand.h"
 
 #define BIOME_MAX_BIOME_TAG_COUNT_PER_VERTEX 32
+#define BIOME_MAX_TERRAIN_VARIATION_COUNT_PER_VERTEX 32
+#define BIOME_MAX_TERRAIN_MODIFICATION_COUNT_PER_VERTEX 32
 #define BIOME_MAX_GAME_OBJECT_COUNT_PER_SUBDIVISION 50
 
 struct SPBiomeThreadState;
@@ -17,9 +19,18 @@ typedef struct SPBiomeThreadState {
 	void* gom; //private
 
 	uint16_t (*getBiomeTag)(struct SPBiomeThreadState*,char*);
-	uint16_t (*getTerrainTypeIndex)(struct SPBiomeThreadState*,char*);
-	uint16_t (*getTerrainVariation)(struct SPBiomeThreadState*,char*);
-	uint16_t (*getGameObjectTypeIndex)(struct SPBiomeThreadState*,char*);
+	uint32_t (*getTerrainBaseTypeIndex)(struct SPBiomeThreadState*,char*);
+	uint32_t (*getTerrainVariation)(struct SPBiomeThreadState*,char*);
+	uint32_t (*getTerrainModification)(struct SPBiomeThreadState*,char*);
+	uint32_t (*getGameObjectTypeIndex)(struct SPBiomeThreadState*,char*);
+
+	uint32_t (*getMaterialTypeIndex)(struct SPBiomeThreadState*,char*);
+	uint32_t (*getMaterialTypeIndexForBaseType)(struct SPBiomeThreadState*,uint32_t);
+	uint32_t (*getMaterialTypeIndexForVariationType)(struct SPBiomeThreadState*,uint32_t);
+
+	uint32_t (*getDecalGroupTypeIndex)(struct SPBiomeThreadState*,char*);
+	uint32_t (*getDecalGroupTypeIndexForBaseType)(struct SPBiomeThreadState*,uint32_t);
+	uint32_t (*getDecalGroupTypeIndexForVariationType)(struct SPBiomeThreadState*,uint32_t);
 
 	SPRand* spRand;
 	SPNoise* spNoise1;
@@ -27,10 +38,18 @@ typedef struct SPBiomeThreadState {
 } SPBiomeThreadState;
 
 
-typedef struct SPSurfaceTypeAndVariation {
-	uint16_t surfaceType;
-	uint16_t variation;
-} SPSurfaceTypeAndVariation;
+typedef struct SPSurfaceTypeResult {
+	uint32_t surfaceBaseType;
+	uint16_t variationCount;
+	uint32_t materialIndex;
+	uint32_t decalTypeIndex;
+} SPSurfaceTypeResult;
+
+typedef struct SPTerrainVertModification {
+	int16_t heightOffset;
+	uint32_t* modifications;
+	uint16_t modificationCount;
+} SPTerrainVertModification;
 
 typedef void (* SPBiomeInitFunc) (SPBiomeThreadState* threadState);
 typedef void (* SPBiomeGetTagsForPointFunc) (SPBiomeThreadState* threadState,
@@ -45,20 +64,24 @@ typedef void (* SPBiomeGetTagsForPointFunc) (SPBiomeThreadState* threadState,
 	float temperatureWinter, 
 	float rainfallSummer, 
 	float rainfallWinter);
-typedef SPSurfaceTypeAndVariation (*SPBiomeGetSurfaceTypeForPointFunc) (SPBiomeThreadState* threadState, 
-	SPSurfaceTypeAndVariation incomingType,
+typedef SPSurfaceTypeResult (*SPBiomeGetSurfaceTypeForPointFunc) (SPBiomeThreadState* threadState, 
+	SPSurfaceTypeResult incomingType,
 	uint16_t* tags,
 	int tagCount,
+	uint32_t* modifications,
+	int modificationCount,
+	uint32_t fillGameObjectTypeIndex,
+	int16_t digFillOffset,
+	uint32_t* variations,
 	SPVec3 pointNormal, 
 	SPVec3 noiseLoc, 
 	double altitude,
 	float steepness,
 	float riverDistance,
-	int vegetationState,
 	int seasonIndex);
 typedef int (*SPBiomeGetTransientGameObjectTypesForFaceSubdivisionFunc) (SPBiomeThreadState* threadState,
 	int incomingTypeCount,
-	uint16_t* types,
+	uint32_t* types,
 	uint16_t* biomeTags,
 	int tagCount,
 	SPVec3 pointNormal, 
@@ -67,7 +90,9 @@ typedef int (*SPBiomeGetTransientGameObjectTypesForFaceSubdivisionFunc) (SPBiome
 	int level, 
 	double altitude, 
 	float steepness,
-	uint16_t terrainType, 
+	uint32_t terrainBaseType, 
+	uint32_t* variations,
+	int variationCount,
 	float riverDistance);
 
 MJ_EXPORT void spBiomeInit(SPBiomeThreadState* threadState);
@@ -85,21 +110,25 @@ MJ_EXPORT void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 	float rainfallSummer, 
 	float rainfallWinter);
 
-MJ_EXPORT SPSurfaceTypeAndVariation spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState, 
-	SPSurfaceTypeAndVariation incomingType,
+MJ_EXPORT SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState, 
+	SPSurfaceTypeResult incomingType,
 	uint16_t* tags,
 	int tagCount,
+	uint32_t* modifications,
+	int modificationCount,
+	uint32_t fillGameObjectTypeIndex,
+	int16_t digFillOffset,
+	uint32_t* variations,
 	SPVec3 pointNormal, 
 	SPVec3 noiseLoc, 
 	double altitude,
 	float steepness,
 	float riverDistance,
-	int vegetationState,
 	int seasonIndex);
 
 MJ_EXPORT int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* threadState,
 	int incomingTypeCount,
-	uint16_t* types,
+	uint32_t* types,
 	uint16_t* biomeTags,
 	int tagCount,
 	SPVec3 pointNormal, 
@@ -108,7 +137,9 @@ MJ_EXPORT int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThread
 	int level, 
 	double altitude, 
 	float steepness,
-	uint16_t terrainType, 
+	uint32_t terrainBaseType, 
+	uint32_t* variations,
+	int variationCount,
 	float riverDistance);
 
 
