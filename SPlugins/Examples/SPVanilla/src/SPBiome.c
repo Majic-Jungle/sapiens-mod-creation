@@ -574,6 +574,25 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	{
 		result.surfaceBaseType = getBeachSurfaceType(&surfaceTypeInfo, riverDistance, noiseValue);
 	}
+	else
+	{
+		if(digFillOffset == 0)
+		{
+			result.surfaceBaseType = terrainBaseType_beachSand;
+		}
+		else if(digFillOffset == -1)
+		{
+			result.surfaceBaseType = terrainBaseType_dirt;
+		}
+		else if(digFillOffset == -2)
+		{
+			result.surfaceBaseType = terrainBaseType_gravel;
+		}
+		else
+		{
+			result.surfaceBaseType = terrainBaseType_rock;
+		}
+	}
 
 	uint32_t grassVariation = 0;
 
@@ -606,16 +625,11 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 				{
 					result.surfaceBaseType = terrainBaseType_redRock;
 				}
-				else if(isDefault)
-				{
-					result.surfaceBaseType = terrainBaseType_dirt;
-				}
 			}
 			else
 			{
 				if(isDefault)
 				{
-					result.surfaceBaseType = terrainBaseType_dirt;
 					grassVariation = terrainVariation_steppeGrass;
 				}
 			}
@@ -624,7 +638,6 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		{
 			if(isDefault)
 			{
-				result.surfaceBaseType = terrainBaseType_dirt;
 				grassVariation = terrainVariation_tropicalRainforestGrass;
 			}
 		}
@@ -632,7 +645,6 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		{
 			if(isDefault)
 			{
-				result.surfaceBaseType = terrainBaseType_dirt;
 				grassVariation = terrainVariation_monsoonGrass;
 			}
 		}
@@ -640,7 +652,6 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		{
 			if(isDefault)
 			{
-				result.surfaceBaseType = terrainBaseType_dirt;
 				grassVariation = terrainVariation_savannaGrass;
 			}
 		}
@@ -655,16 +666,13 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		{
 			if(isDefault)
 			{
-				result.surfaceBaseType = terrainBaseType_dirt;
 				grassVariation = terrainVariation_tundraGrass;
 			}
 		}
 		if(tags[i] == biomeTag_temperate)
 		{
-
 			if(isDefault)
 			{
-				result.surfaceBaseType = terrainBaseType_dirt;
 				if(seasonIndex == 0 || seasonIndex == 1)
 				{
 					grassVariation = terrainVariation_temperateGrass;
