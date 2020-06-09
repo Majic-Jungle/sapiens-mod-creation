@@ -14,6 +14,12 @@
 
 struct SPBiomeThreadState;
 
+typedef struct SPSurfaceTypeDefault {
+	uint32_t materialIndexA;
+	uint32_t materialIndexB;
+	uint32_t decalGroupIndex;
+} SPSurfaceTypeDefault;
+
 typedef struct SPBiomeThreadState {
 	void* terrainGenerator; //private
 	void* gom; //private
@@ -25,12 +31,11 @@ typedef struct SPBiomeThreadState {
 	uint32_t (*getGameObjectTypeIndex)(struct SPBiomeThreadState*,char*);
 
 	uint32_t (*getMaterialTypeIndex)(struct SPBiomeThreadState*,char*);
-	uint32_t (*getMaterialTypeIndexForBaseType)(struct SPBiomeThreadState*,uint32_t);
-	uint32_t (*getMaterialTypeIndexForVariationType)(struct SPBiomeThreadState*,uint32_t);
-
 	uint32_t (*getDecalGroupTypeIndex)(struct SPBiomeThreadState*,char*);
-	uint32_t (*getDecalGroupTypeIndexForBaseType)(struct SPBiomeThreadState*,uint32_t);
-	uint32_t (*getDecalGroupTypeIndexForVariationType)(struct SPBiomeThreadState*,uint32_t);
+
+	SPSurfaceTypeDefault (*getSurfaceDefaultsForBaseType)(struct SPBiomeThreadState*,uint32_t);
+	SPSurfaceTypeDefault (*getSurfaceDefaultsForVariationType)(struct SPBiomeThreadState*,uint32_t);
+
 
 	SPRand* spRand;
 	SPNoise* spNoise1;
@@ -41,7 +46,8 @@ typedef struct SPBiomeThreadState {
 typedef struct SPSurfaceTypeResult {
 	uint32_t surfaceBaseType;
 	uint16_t variationCount;
-	uint32_t materialIndex;
+	uint32_t materialIndexA;
+	uint32_t materialIndexB;
 	uint32_t decalTypeIndex;
 } SPSurfaceTypeResult;
 

@@ -537,7 +537,13 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	if(altitude < -0.00000001)
 	{
 		result.surfaceBaseType = getBeachSurfaceType(&surfaceTypeInfo, riverDistance, noiseValue);
-		result.materialIndex = threadState->getMaterialTypeIndexForBaseType(threadState, result.surfaceBaseType);
+
+		SPSurfaceTypeDefault defaults = threadState->getSurfaceDefaultsForBaseType(threadState, result.surfaceBaseType);
+
+		result.materialIndexA = defaults.materialIndexA;
+		result.materialIndexB = defaults.materialIndexB;
+		result.decalTypeIndex = defaults.decalGroupIndex;
+
 		return result;
 	}
 
@@ -723,24 +729,17 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 
 	if(result.variationCount > 0)
 	{
-		result.materialIndex = threadState->getMaterialTypeIndexForVariationType(threadState, variations[result.variationCount - 1]);
-		result.decalTypeIndex = threadState->getDecalGroupTypeIndexForVariationType(threadState, variations[result.variationCount - 1]);
-
-		//result.decalTypeIndex = threadState->getDecalGroupTypeIndexForBaseType(threadState, result.surfaceBaseType);
-
-		/*if(grassVariation)
-		{
-			result.decalTypeIndex = threadState->getDecalGroupTypeIndexForVariationType(threadState, grassVariation);
-		}
-		else
-		{
-			result.decalTypeIndex = threadState->getDecalGroupTypeIndexForBaseType(threadState, result.surfaceBaseType);
-		}*/
+		SPSurfaceTypeDefault variationDefaults = threadState->getSurfaceDefaultsForVariationType(threadState, variations[result.variationCount - 1]);
+		result.materialIndexA = variationDefaults.materialIndexA;
+		result.materialIndexB = variationDefaults.materialIndexB;
+		result.decalTypeIndex = variationDefaults.decalGroupIndex;
 	}
 	else
 	{
-		result.materialIndex = threadState->getMaterialTypeIndexForBaseType(threadState, result.surfaceBaseType);
-		result.decalTypeIndex = threadState->getDecalGroupTypeIndexForBaseType(threadState, result.surfaceBaseType);
+		SPSurfaceTypeDefault defaults = threadState->getSurfaceDefaultsForBaseType(threadState, result.surfaceBaseType);
+		result.materialIndexA = defaults.materialIndexA;
+		result.materialIndexB = defaults.materialIndexB;
+		result.decalTypeIndex = defaults.decalGroupIndex;
 	}
 
 	return result;
