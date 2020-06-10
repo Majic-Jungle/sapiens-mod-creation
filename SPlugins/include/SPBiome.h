@@ -36,6 +36,8 @@ typedef struct SPBiomeThreadState {
 	SPSurfaceTypeDefault (*getSurfaceDefaultsForBaseType)(struct SPBiomeThreadState*,uint32_t);
 	SPSurfaceTypeDefault (*getSurfaceDefaultsForVariationType)(struct SPBiomeThreadState*,uint32_t);
 
+	uint32_t (*getSurfaceBaseTypeForFillObjectType)(struct SPBiomeThreadState*,uint32_t);
+
 
 	SPRand* spRand;
 	SPNoise* spNoise1;

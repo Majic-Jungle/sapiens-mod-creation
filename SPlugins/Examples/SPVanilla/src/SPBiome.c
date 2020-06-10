@@ -534,9 +534,15 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 59999.0);
 	double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
 
+	uint32_t fillSurfaceBaseType = 0;
+	if(fillGameObjectTypeIndex != 0)
+	{
+		fillSurfaceBaseType = threadState->getSurfaceBaseTypeForFillObjectType(threadState, fillGameObjectTypeIndex);
+	}
+
 	if(altitude < -0.00000001)
 	{
-		result.surfaceBaseType = getBeachSurfaceType(&surfaceTypeInfo, riverDistance, noiseValue);
+		result.surfaceBaseType = (fillSurfaceBaseType != 0 ? fillSurfaceBaseType : getBeachSurfaceType(&surfaceTypeInfo, riverDistance, noiseValue));
 
 		SPSurfaceTypeDefault defaults = threadState->getSurfaceDefaultsForBaseType(threadState, result.surfaceBaseType);
 
@@ -569,34 +575,80 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 
 	bool isDefault = (!isRock && !isDirt && !isBeach);
 
-	//defaults
 
-	result.surfaceBaseType = terrainBaseType_dirt;
-	if(isRock)
+	if(fillSurfaceBaseType != 0)
 	{
-		result.surfaceBaseType = terrainBaseType_rock;
-	}
-	if(isBeach)
-	{
-		result.surfaceBaseType = getBeachSurfaceType(&surfaceTypeInfo, riverDistance, noiseValue);
+		result.surfaceBaseType = fillSurfaceBaseType;
 	}
 	else
 	{
-		if(digFillOffset == 0)
+		result.surfaceBaseType = terrainBaseType_dirt;
+		if(isRock)
 		{
-			result.surfaceBaseType = terrainBaseType_beachSand;
+			result.surfaceBaseType = terrainBaseType_rock;
 		}
-		else if(digFillOffset == -1)
+		if(isBeach)
 		{
-			result.surfaceBaseType = terrainBaseType_dirt;
-		}
-		else if(digFillOffset == -2)
-		{
-			result.surfaceBaseType = terrainBaseType_gravel;
+			result.surfaceBaseType = getBeachSurfaceType(&surfaceTypeInfo, riverDistance, noiseValue);
 		}
 		else
 		{
-			result.surfaceBaseType = terrainBaseType_rock;
+			if(digFillOffset == 0)
+			{
+				result.surfaceBaseType = terrainBaseType_beachSand;
+			}
+			else if(digFillOffset == -1)
+			{
+				result.surfaceBaseType = terrainBaseType_dirt;
+			}
+			else if(digFillOffset == -2)
+			{
+				result.surfaceBaseType = terrainBaseType_gravel;
+			}
+			else
+			{
+				result.surfaceBaseType = terrainBaseType_rock;
+			}
+		}
+
+
+		for(int i = 0; i < tagCount; i++)
+		{
+			if(tags[i] == biomeTag_desert)
+			{
+				if(isRock)
+				{
+					result.surfaceBaseType = terrainBaseType_redRock;
+				}
+				else
+				{
+					if(surfaceTypeInfo.hot)
+					{
+						result.surfaceBaseType =  terrainBaseType_desertRedSand;
+					}
+					else
+					{
+						result.surfaceBaseType = terrainBaseType_desertSand;
+					}
+				}
+			}
+			else if(tags[i] == biomeTag_steppe)
+			{
+				if(surfaceTypeInfo.hot)
+				{
+					if(isRock)
+					{
+						result.surfaceBaseType = terrainBaseType_redRock;
+					}
+				}
+			}
+			else if(tags[i] == biomeTag_icecap)
+			{
+				if(!isRock && !isDirt)
+				{
+					result.surfaceBaseType = terrainBaseType_ice;
+				}
+			}
 		}
 	}
 
@@ -605,34 +657,10 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	//check for primary designations
 	for(int i = 0; i < tagCount; i++)
 	{
-		if(tags[i] == biomeTag_desert)
-		{
-			if(isRock)
-			{
-				result.surfaceBaseType = terrainBaseType_redRock;
-			}
-			else
-			{
-				if(surfaceTypeInfo.hot)
-				{
-					result.surfaceBaseType =  terrainBaseType_desertRedSand;
-				}
-				else
-				{
-					result.surfaceBaseType = terrainBaseType_desertSand;
-				}
-			}
-		}
+		
 		if(tags[i] == biomeTag_steppe)
 		{
-			if(surfaceTypeInfo.hot)
-			{
-				if(isRock)
-				{
-					result.surfaceBaseType = terrainBaseType_redRock;
-				}
-			}
-			else
+			if(!surfaceTypeInfo.hot)
 			{
 				if(isDefault)
 				{
@@ -659,13 +687,6 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 			if(isDefault)
 			{
 				grassVariation = terrainVariation_savannaGrass;
-			}
-		}
-		if(tags[i] == biomeTag_icecap)
-		{
-			if(!isRock && !isDirt)
-			{
-				result.surfaceBaseType = terrainBaseType_ice;
 			}
 		}
 		if(tags[i] == biomeTag_tundra)
