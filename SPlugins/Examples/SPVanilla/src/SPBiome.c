@@ -42,9 +42,12 @@ static uint32_t terrainBaseType_ice;
 static uint32_t terrainBaseType_desertRedSand;
 static uint32_t terrainBaseType_redRock;
 static uint32_t terrainBaseType_dirt;
+static uint32_t terrainBaseType_richDirt;
+static uint32_t terrainBaseType_poorDirt;
 
 static uint32_t terrainVariation_snow;
 static uint32_t terrainVariation_temperateGrass;
+static uint32_t terrainVariation_temperateGrassPlentiful;
 static uint32_t terrainVariation_taigaGrass;
 static uint32_t terrainVariation_mediterraneanGrass;
 static uint32_t terrainVariation_steppeGrass;
@@ -124,9 +127,12 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 	terrainBaseType_desertRedSand				= threadState->getTerrainBaseTypeIndex(threadState, "desertRedSand");
 	terrainBaseType_redRock						= threadState->getTerrainBaseTypeIndex(threadState, "redRock");
 	terrainBaseType_dirt						= threadState->getTerrainBaseTypeIndex(threadState, "dirt");
+	terrainBaseType_richDirt						= threadState->getTerrainBaseTypeIndex(threadState, "richDirt");
+	terrainBaseType_poorDirt						= threadState->getTerrainBaseTypeIndex(threadState, "poorDirt");
 												
 	terrainVariation_snow						= threadState->getTerrainVariation(threadState, "snow");
 	terrainVariation_temperateGrass				= threadState->getTerrainVariation(threadState, "temperateGrass");
+	terrainVariation_temperateGrassPlentiful	= threadState->getTerrainVariation(threadState, "temperateGrassPlentiful");
 	terrainVariation_taigaGrass					= threadState->getTerrainVariation(threadState, "taigaGrass");
 	terrainVariation_mediterraneanGrass			= threadState->getTerrainVariation(threadState, "mediterraneanGrass");
 	terrainVariation_steppeGrass				= threadState->getTerrainVariation(threadState, "steppeGrass");
@@ -493,11 +499,11 @@ void getSurfaceTypeInfo(uint16_t* biomeTags, int tagCount, int seasonIndex, Surf
 	}
 }
 
-uint32_t getBeachSurfaceType(SurfaceTypeInfo* surfaceTypeInfo, float riverDistance, float noiseValue)
+uint32_t getBeachSurfaceType(SurfaceTypeInfo* surfaceTypeInfo, float riverDistance, float noiseValue, int16_t digFillOffset)
 {
 	if(surfaceTypeInfo->river)
 	{
-		if(riverDistance < (noiseValue * 0.01 + 0.005))
+		if(riverDistance < (noiseValue * 0.01 + 0.005) - (0.04 * digFillOffset))
 		{
 			return terrainBaseType_gravel;
 		}
@@ -507,7 +513,7 @@ uint32_t getBeachSurfaceType(SurfaceTypeInfo* surfaceTypeInfo, float riverDistan
 		}
 	}
 
-	return (noiseValue > 0.1 ? terrainBaseType_gravel : terrainBaseType_beachSand);
+	return (noiseValue > 0.1 + (0.4 * digFillOffset) ? terrainBaseType_gravel : terrainBaseType_beachSand);
 }
 
 SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState,
@@ -534,6 +540,12 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 59999.0);
 	double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
 
+	SPVec3 scaledNoiseLocMedcale = spVec3Mul(noiseLoc, 12073.0);
+	double noiseValueMed = spNoiseGet(threadState->spNoise1, scaledNoiseLocMedcale, 4);
+
+	SPVec3 scaledNoiseLocLargeScale = spVec3Mul(noiseLoc, 2073.0);
+	double noiseValueLarge = spNoiseGet(threadState->spNoise1, scaledNoiseLocLargeScale, 4);
+
 	uint32_t fillSurfaceBaseType = 0;
 	if(fillGameObjectTypeIndex != 0)
 	{
@@ -542,18 +554,17 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 
 	if(altitude < -0.00000001)
 	{
-		result.surfaceBaseType = (fillSurfaceBaseType != 0 ? fillSurfaceBaseType : getBeachSurfaceType(&surfaceTypeInfo, riverDistance, noiseValue));
+		result.surfaceBaseType = (fillSurfaceBaseType != 0 ? fillSurfaceBaseType : getBeachSurfaceType(&surfaceTypeInfo, riverDistance, noiseValue, digFillOffset));
 
 		SPSurfaceTypeDefault defaults = threadState->getSurfaceDefaultsForBaseType(threadState, result.surfaceBaseType);
 
 		result.materialIndexA = defaults.materialIndexA;
 		result.materialIndexB = defaults.materialIndexB;
-		result.decalTypeIndex = defaults.decalGroupIndex;
+		result.decalTypeIndex = 0;
 
 		return result;
 	}
 
-	bool isBeach = ((altitude + noiseValue * 0.00000005) < 0.0000001);
 	bool snowRemoved = false;
 	bool vegetationRemoved = false;
 
@@ -569,11 +580,20 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		}
 	}
 
+	bool isBeach = ((altitude + noiseValue * 0.00000005 + noiseValueLarge * 0.0000005) < 0.0000001);
 	bool isRock = (steepness > rockSteepness + noiseValue * 0.2);
-	bool isDirt = (steepness > noiseValue + 0.5);
-	bool isSecondary = (noiseValue > 0.0);
 
-	bool isDefault = (!isRock && !isDirt && !isBeach);
+	if(digFillOffset != 0 && !isRock)
+	{
+		if(digFillOffset < (noiseValue * 4) - 2)
+		{
+			isRock = true;
+		}
+	}
+
+	bool isDefault = (!isRock && !isBeach);
+
+	int soilQuality = 1;
 
 
 	if(fillSurfaceBaseType != 0)
@@ -582,32 +602,30 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	}
 	else
 	{
-		result.surfaceBaseType = terrainBaseType_dirt;
 		if(isRock)
 		{
 			result.surfaceBaseType = terrainBaseType_rock;
 		}
-		if(isBeach)
+		else if(isBeach)
 		{
-			result.surfaceBaseType = getBeachSurfaceType(&surfaceTypeInfo, riverDistance, noiseValue);
+			result.surfaceBaseType = getBeachSurfaceType(&surfaceTypeInfo, riverDistance, noiseValue, digFillOffset);
 		}
 		else
 		{
-			if(digFillOffset == 0)
+			if(noiseValueMed < -0.4)
 			{
-				result.surfaceBaseType = terrainBaseType_beachSand;
+				result.surfaceBaseType = terrainBaseType_poorDirt;
+				soilQuality = 0;
 			}
-			else if(digFillOffset == -1)
+			else if(noiseValueMed > 0.4)
 			{
-				result.surfaceBaseType = terrainBaseType_dirt;
-			}
-			else if(digFillOffset == -2)
-			{
-				result.surfaceBaseType = terrainBaseType_gravel;
+				result.surfaceBaseType = terrainBaseType_richDirt;
+				soilQuality = 2;
 			}
 			else
 			{
-				result.surfaceBaseType = terrainBaseType_rock;
+				result.surfaceBaseType = terrainBaseType_dirt;
+				soilQuality = 1;
 			}
 		}
 
@@ -644,7 +662,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 			}
 			else if(tags[i] == biomeTag_icecap)
 			{
-				if(!isRock && !isDirt)
+				if(!isRock)
 				{
 					result.surfaceBaseType = terrainBaseType_ice;
 				}
@@ -654,71 +672,85 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 
 	uint32_t grassVariation = 0;
 
-	//check for primary designations
-	for(int i = 0; i < tagCount; i++)
+	if (!vegetationRemoved && isDefault)
 	{
-		
-		if(tags[i] == biomeTag_steppe)
+		for (int i = 0; i < tagCount; i++)
 		{
-			if(!surfaceTypeInfo.hot)
+			if (tags[i] == biomeTag_steppe)
 			{
-				if(isDefault)
+				if (!surfaceTypeInfo.hot)
 				{
 					grassVariation = terrainVariation_steppeGrass;
 				}
 			}
-		}
-		if(tags[i] == biomeTag_rainforest)
-		{
-			if(isDefault)
+			else if (tags[i] == biomeTag_rainforest)
 			{
 				grassVariation = terrainVariation_tropicalRainforestGrass;
 			}
-		}
-		if(tags[i] == biomeTag_monsoon)
-		{
-			if(isDefault)
+			if (tags[i] == biomeTag_monsoon)
 			{
 				grassVariation = terrainVariation_monsoonGrass;
 			}
-		}
-		if(tags[i] == biomeTag_savanna)
-		{
-			if(isDefault)
+			if (tags[i] == biomeTag_savanna)
 			{
 				grassVariation = terrainVariation_savannaGrass;
 			}
-		}
-		if(tags[i] == biomeTag_tundra)
-		{
-			if(isDefault)
+			if (tags[i] == biomeTag_tundra)
 			{
 				grassVariation = terrainVariation_tundraGrass;
 			}
-		}
-		if(tags[i] == biomeTag_temperate)
-		{
-			if(isDefault)
+			if (tags[i] == biomeTag_temperate)
 			{
-				if(seasonIndex == 0 || seasonIndex == 1)
+				if (seasonIndex == 0 || seasonIndex == 1)
 				{
-					grassVariation = terrainVariation_temperateGrass;
+					if(soilQuality == 0)
+					{
+						grassVariation = terrainVariation_tundraGrass;
+					}
+					else if(soilQuality == 1)
+					{
+						grassVariation = terrainVariation_temperateGrass;
+					}
+					else
+					{
+						grassVariation = terrainVariation_temperateGrassPlentiful;
+					}
 				}
-				else if(seasonIndex == 2)
+				else if (seasonIndex == 2)
 				{
-					grassVariation = terrainVariation_mediterraneanGrass;
+					if(soilQuality == 0)
+					{
+						grassVariation = 0;
+					}
+					else if(soilQuality == 1)
+					{
+						grassVariation = terrainVariation_mediterraneanGrass;
+					}
+					else
+					{
+						grassVariation = terrainVariation_temperateGrass;
+					}
 				}
 				else
 				{
-					grassVariation = terrainVariation_tundraGrass;
+					if(soilQuality == 0)
+					{
+						grassVariation = 0;
+					}
+					else if(soilQuality == 1)
+					{
+						grassVariation = terrainVariation_tundraGrass;
+					}
+					else
+					{
+						grassVariation = terrainVariation_temperateGrass;
+					}
 				}
 			}
 		}
 	}
 
 	bool hasSnow = false;
-
-	//add snow
 	if(!snowRemoved && surfaceTypeInfo.snowDepth > 0)
 	{
 		if(surfaceTypeInfo.snowDepth == 3)
@@ -732,11 +764,6 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 				hasSnow = true;
 			}
 		}
-	}
-
-	if(vegetationRemoved)
-	{
-		grassVariation = 0;
 	}
 
 	if(grassVariation != 0)
