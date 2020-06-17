@@ -186,7 +186,7 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 float getSoilRichnessNoiseValue(SPBiomeThreadState* threadState, SPVec3 noiseLoc, float steepness, float riverDistance)
 {
 	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 12000.0);
-	return spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4) - steepness * 0.5 + (1.0 - riverDistance);
+	return spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4) - steepness * 0.5 + (1.0 - pow(riverDistance, 0.3)) * 0.6;
 }
 
 void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
@@ -383,11 +383,11 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 					double noiseValue = getSoilRichnessNoiseValue(threadState, noiseLoc, steepness, riverDistance);
 					if(noiseValue > -0.2)
 					{
-						if(noiseValue > 0.5)
+						if(noiseValue > 0.7)
 						{
 							tagsOut[tagCount++] = biomeTag_denseForest;
 						}
-						else if(noiseValue > 0.2)
+						else if(noiseValue > 0.4)
 						{
 							tagsOut[tagCount++] = biomeTag_mediumForest;
 						}
