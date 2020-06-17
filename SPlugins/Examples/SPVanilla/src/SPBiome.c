@@ -786,7 +786,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	}
 
 
-	if(noiseValueMed > 0.3)
+	if(noiseValueMed > 0.4)
 	{
 		variations[result.variationCount++] = terrainVariation_flint;
 	}
@@ -1225,7 +1225,7 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 
 					if(objectCount > 0)
 					{
-						if(objectCount > 1)
+						if(objectCount > 0)
 						{
 							uint32_t oreType = 0;
 							for(int i = 0; i < variationCount; i++)
@@ -1237,17 +1237,20 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 							}
 							if(oreType != 0)
 							{
-								for(int i = 0; i < objectCount / 2; i++)
+								for(int i = 0; i < objectCount; i++)
 								{
 									ADD_OBJECT(oreType);
 								}
 							}
+							else
+							{
+								for(int i = 0; i < objectCount; i++)
+								{
+									ADD_OBJECT(gameObjectType_smallRock);
+								}
+							}
 						}
 
-						for(int i = 0; i < objectCount; i++)
-						{
-							ADD_OBJECT(gameObjectType_smallRock);
-						}
 					}
 				}
 			}
