@@ -5,7 +5,9 @@
 //define local identifiers for this mod to use, it will be given back as the localTypeID in update functions, and used by the engine to determine particle type when adding particles
 
 enum {
-	sp_vanillaEmitterTypeCampfire = 0,
+	sp_vanillaEmitterTypeCampfireLarge = 0,
+	sp_vanillaEmitterTypeCampfireMedium,
+	sp_vanillaEmitterTypeCampfireSmall,
 	sp_vanillaEmitterTypeWoodChop,
 	sp_vanillaEmitterTypeFeathers
 };
@@ -21,11 +23,19 @@ enum {
 //define emitter types that we wish to override or add. Vanilla functions and functions for mods with earlier order indexes than this one that override the same type, will not get called.
 //Mods with later order indexes than this mod will win, so it's possible that even though you define behavior in the functions here, those functions may not actually get called..
 
-#define EMITTER_TYPES_COUNT 3
+#define EMITTER_TYPES_COUNT 5
 static SPParticleEmitterTypeInfo particleEmitterTypeInfos[EMITTER_TYPES_COUNT] = {
 	{
-		"campfire",
-		sp_vanillaEmitterTypeCampfire
+		"campfireLarge",
+		sp_vanillaEmitterTypeCampfireLarge
+	},
+	{
+		"campfireMedium",
+		sp_vanillaEmitterTypeCampfireMedium
+	},
+	{
+		"campfireSmall",
+		sp_vanillaEmitterTypeCampfireSmall
 	},
 	{
 		"woodChop",
@@ -105,7 +115,9 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 
 	switch(localEmitterTypeID)
 	{
-	case sp_vanillaEmitterTypeCampfire:
+	case sp_vanillaEmitterTypeCampfireLarge:
+	case sp_vanillaEmitterTypeCampfireMedium:
+	case sp_vanillaEmitterTypeCampfireSmall:
 	{
 	
 	}
@@ -192,7 +204,7 @@ void emitFireParticle(SPParticleThreadState* threadState,
 	SPVec3 normalizedPos = spVec3Div(emitterState->p, posLength);
 
 	state.p = spVec3Add(spVec3Mul(normalizedPos, posLength + SP_METERS_TO_PRERENDER(0.1)), randPosVec);
-	state.v = spVec3Mul(normalizedPos, SP_METERS_TO_PRERENDER(0.2 + spRandGetValue(spRand) * 0.2));
+	state.v = spVec3Mul(normalizedPos, SP_METERS_TO_PRERENDER(0.2 + spRandGetValue(spRand) * scaleAverage));
 	state.particleTextureType = ((spRandGetValue(spRand) > 0.5) ? 1 : 4);
 	state.lifeLeft = 1.0;
 	state.scale = scaleAverage + spRandGetValue(spRand) * 0.2;
@@ -222,7 +234,9 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 		emitterState->timeAccumulatorB += fixedTimeStep;
 		switch(localEmitterTypeID)
 		{
-		case sp_vanillaEmitterTypeCampfire:
+		case sp_vanillaEmitterTypeCampfireLarge:
+		case sp_vanillaEmitterTypeCampfireMedium:
+		case sp_vanillaEmitterTypeCampfireSmall:
 		{
 			if(emitterState->counters[0] == 0) // SMOKE
 			{
@@ -265,17 +279,30 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 				emitterState->counters[0]--;
 			}
 
+			float quantityMultiplier = 1.0;
+			float scaleMultiplier = 1.0;
+			if(localEmitterTypeID == sp_vanillaEmitterTypeCampfireLarge)
+			{
+				quantityMultiplier = 3.0;
+				scaleMultiplier = 1.5;
+			}
+			else if(localEmitterTypeID == sp_vanillaEmitterTypeCampfireSmall)
+			{
+				quantityMultiplier = 0.5;
+				scaleMultiplier = 0.5;
+			}
+
 			if(emitterState->counters[1] == 0) //FLAME 1
 			{
-				SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(0.04));
-				double scaleAverage = 0.3;
+				SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(0.04) * scaleMultiplier);
+				double scaleAverage = 0.3 * scaleMultiplier;
 
 				emitFireParticle(threadState,
 					emitterState,
 					scaleAverage,
 					randPosVec);
 
-				emitterState->counters[1] = 2 + (uint8_t)(10 * spRandGetValue(spRand));
+				emitterState->counters[1] = 2 + (uint8_t)(10 * spRandGetValue(spRand) / quantityMultiplier);
 
 			}
 			else
@@ -285,16 +312,16 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 
 			if(emitterState->counters[2] == 0) //FLAME 2
 			{
-				SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(0.04));
-				randPosVec = spVec3Add(randPosVec, spVec3Mul(spMat3GetRow(emitterState->rot, 0), SP_METERS_TO_PRERENDER(0.2)));
-				double scaleAverage = 0.15;
+				SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(0.04) * scaleMultiplier);
+				randPosVec = spVec3Add(randPosVec, spVec3Mul(spMat3GetRow(emitterState->rot, 0), SP_METERS_TO_PRERENDER(0.2) * scaleMultiplier));
+				double scaleAverage = 0.15 * scaleMultiplier;
 
 				emitFireParticle(threadState, 
 					emitterState,
 					scaleAverage,
 					randPosVec);
 
-				emitterState->counters[2] = 2 + (uint8_t)(10 * spRandGetValue(spRand));
+				emitterState->counters[2] = 2 + (uint8_t)(10 * spRandGetValue(spRand) / quantityMultiplier);
 
 			}
 			else
@@ -304,20 +331,20 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 
 			if(emitterState->counters[3] == 0) //FLAME 3
 			{
-				SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(0.04));
-				randPosVec = spVec3Add(randPosVec, spVec3Mul(spMat3GetRow(emitterState->rot, 2), SP_METERS_TO_PRERENDER(0.1)));
-				double scaleAverage = 0.1;
+				SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(0.04) * scaleMultiplier);
+				randPosVec = spVec3Add(randPosVec, spVec3Mul(spMat3GetRow(emitterState->rot, 2), SP_METERS_TO_PRERENDER(0.1) * scaleMultiplier));
+				double scaleAverage = 0.1 * scaleMultiplier;
 
 				emitFireParticle(threadState, 
 					emitterState,
 					scaleAverage,
 					randPosVec);
 
-				emitterState->counters[3] = 2 + (uint8_t)(10 * spRandGetValue(spRand));
+				emitterState->counters[3] = 2 + (uint8_t)(10 * spRandGetValue(spRand) / quantityMultiplier);
 			}
 			else 
 			{
-				if(emitterState->counters[3] == 8) //spark
+				if(emitterState->counters[3] == 8 / quantityMultiplier) //spark
 				{
 
 					double posLength = spVec3Length(emitterState->p);
