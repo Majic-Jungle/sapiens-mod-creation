@@ -549,7 +549,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
 
 
-	SPVec3 scaledNoiseMedScale = spVec3Mul(noiseLoc, 12273.0);
+	SPVec3 scaledNoiseMedScale = spVec3Mul(noiseLoc, 22273.0);
 	double noiseValueMed = spNoiseGet(threadState->spNoise1, scaledNoiseMedScale, 3);
 
 	double soilRichnessNoiseValue = getSoilRichnessNoiseValue(threadState, noiseLoc, steepness, riverDistance);
@@ -786,7 +786,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	}
 
 
-	if(noiseValueMed > 0.4)
+	if(noiseValueMed > 0.3 && soilRichnessNoiseValue < 0.1 && noiseValue < 0.0)
 	{
 		variations[result.variationCount++] = terrainVariation_flint;
 	}
