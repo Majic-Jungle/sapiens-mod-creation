@@ -810,7 +810,21 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		{
 			result.materialIndexA = variationDefaults.materialIndexA;
 			result.materialIndexB = variationDefaults.materialIndexB;
-			result.decalTypeIndex = variationDefaults.decalGroupIndex;
+			if(hasSnow)
+			{
+				if(grassVariation != 0)
+				{
+					result.decalTypeIndex = variationDefaults.decalGroupIndex;
+				}
+				else
+				{
+					result.decalTypeIndex = 0;
+				}
+			}
+			else
+			{
+				result.decalTypeIndex = variationDefaults.decalGroupIndex;
+			}
 		}
 	}
 	
