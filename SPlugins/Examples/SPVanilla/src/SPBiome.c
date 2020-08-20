@@ -572,6 +572,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		result.materialIndexA = defaults.materialIndexA;
 		result.materialIndexB = defaults.materialIndexB;
 		result.decalTypeIndex = 0;
+		result.pathDifficultyMultiplier = defaults.pathDifficultyMultiplier;
 
 		return result;
 	}
@@ -810,6 +811,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		{
 			result.materialIndexA = variationDefaults.materialIndexA;
 			result.materialIndexB = variationDefaults.materialIndexB;
+			result.pathDifficultyMultiplier = variationDefaults.pathDifficultyMultiplier;
 			if(hasSnow)
 			{
 				if(grassVariation != 0)
@@ -834,6 +836,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		result.materialIndexA = defaults.materialIndexA;
 		result.materialIndexB = defaults.materialIndexB;
 		result.decalTypeIndex = defaults.decalGroupIndex;
+		result.pathDifficultyMultiplier = defaults.pathDifficultyMultiplier;
 	}
 
 	return result;
