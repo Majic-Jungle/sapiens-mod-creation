@@ -8,6 +8,8 @@ enum {
 	sp_vanillaEmitterTypeCampfireLarge = 0,
 	sp_vanillaEmitterTypeCampfireMedium,
 	sp_vanillaEmitterTypeCampfireSmall,
+	sp_vanillaEmitterTypeTorchLarge,
+	sp_vanillaEmitterTypeTorchSmall,
 	sp_vanillaEmitterTypeWoodChop,
 	sp_vanillaEmitterTypeFeathers
 };
@@ -23,7 +25,7 @@ enum {
 //define emitter types that we wish to override or add. Vanilla functions and functions for mods with earlier order indexes than this one that override the same type, will not get called.
 //Mods with later order indexes than this mod will win, so it's possible that even though you define behavior in the functions here, those functions may not actually get called..
 
-#define EMITTER_TYPES_COUNT 5
+#define EMITTER_TYPES_COUNT 7
 static SPParticleEmitterTypeInfo particleEmitterTypeInfos[EMITTER_TYPES_COUNT] = {
 	{
 		"campfireLarge",
@@ -36,6 +38,14 @@ static SPParticleEmitterTypeInfo particleEmitterTypeInfos[EMITTER_TYPES_COUNT] =
 	{
 		"campfireSmall",
 		sp_vanillaEmitterTypeCampfireSmall
+	},
+	{
+		"torchLarge",
+		sp_vanillaEmitterTypeTorchLarge
+	},
+	{
+		"torchSmall",
+		sp_vanillaEmitterTypeTorchSmall
 	},
 	{
 		"woodChop",
@@ -118,6 +128,8 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 	case sp_vanillaEmitterTypeCampfireLarge:
 	case sp_vanillaEmitterTypeCampfireMedium:
 	case sp_vanillaEmitterTypeCampfireSmall:
+	case sp_vanillaEmitterTypeTorchLarge:
+	case sp_vanillaEmitterTypeTorchSmall:
 	{
 	
 	}
@@ -237,6 +249,8 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 		case sp_vanillaEmitterTypeCampfireLarge:
 		case sp_vanillaEmitterTypeCampfireMedium:
 		case sp_vanillaEmitterTypeCampfireSmall:
+		case sp_vanillaEmitterTypeTorchLarge:
+		case sp_vanillaEmitterTypeTorchSmall:
 		{
 			if(emitterState->counters[0] == 0) // SMOKE
 			{
@@ -255,6 +269,12 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 				state.scale = 0.2 + spRandGetValue(spRand) * 0.2;
 				state.randomValueA = spRandGetValue(spRand);
 				state.randomValueB = spRandGetValue(spRand);
+				if(localEmitterTypeID == sp_vanillaEmitterTypeTorchLarge || localEmitterTypeID == sp_vanillaEmitterTypeTorchSmall)
+				{
+					//state.lifeLeft = 0.2;
+					state.randomValueB += 4.0;
+					//state.scale = state.scale * 0.5;
+				}
 				SPVec3 lookup = {(normalizedPos.x + 1.2) * 99999.9, (normalizedPos.y * 4.5 + normalizedPos.z + 2.4) * 99999.9, emitterState->timeAccumulatorB * 0.1};
 				SPVec3 lookupB = {(normalizedPos.x + 1.4) * 99999.9, (normalizedPos.y * 4.6 + normalizedPos.z + 2.8) * 99999.9, emitterState->timeAccumulatorB * 0.1};
 				SPVec3 lookupC = {(normalizedPos.x + 1.8) * 99999.9, (normalizedPos.y * 4.8 + normalizedPos.z + 2.9) * 99999.9, emitterState->timeAccumulatorB * 0.5};
@@ -279,17 +299,27 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 				emitterState->counters[0]--;
 			}
 
-			float quantityMultiplier = 1.0;
-			float scaleMultiplier = 1.0;
+			float quantityMultiplier = 1.0f;
+			float scaleMultiplier = 1.0f;
 			if(localEmitterTypeID == sp_vanillaEmitterTypeCampfireLarge)
 			{
-				quantityMultiplier = 3.0;
-				scaleMultiplier = 1.5;
+				quantityMultiplier = 3.0f;
+				scaleMultiplier = 1.5f;
 			}
 			else if(localEmitterTypeID == sp_vanillaEmitterTypeCampfireSmall)
 			{
-				quantityMultiplier = 0.5;
-				scaleMultiplier = 0.5;
+				quantityMultiplier = 0.5f;
+				scaleMultiplier = 0.5f;
+			}
+			else if(localEmitterTypeID == sp_vanillaEmitterTypeTorchLarge)
+			{
+				quantityMultiplier = 0.5f;
+				scaleMultiplier = 0.3f;
+			}
+			else if(localEmitterTypeID == sp_vanillaEmitterTypeTorchSmall)
+			{
+				quantityMultiplier = 0.25f;
+				scaleMultiplier = 0.2f;
 			}
 
 			if(emitterState->counters[1] == 0) //FLAME 1
