@@ -569,8 +569,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 
 		SPSurfaceTypeDefault defaults = threadState->getSurfaceDefaultsForBaseType(threadState, result.surfaceBaseType);
 
-		result.materialIndexA = defaults.materialIndexA;
-		result.materialIndexB = defaults.materialIndexB;
+		result.materialIndex = defaults.materialIndex;
 		result.decalTypeIndex = 0;
 		result.pathDifficultyMultiplier = defaults.pathDifficultyMultiplier;
 
@@ -802,15 +801,14 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		variations[result.variationCount++] = terrainVariation_snow;
 	}
 
-	result.materialIndexA = 0;
+	result.materialIndex = 0;
 
 	if(grassVariation != 0 || hasSnow)
 	{
 		SPSurfaceTypeDefault variationDefaults = threadState->getSurfaceDefaultsForVariationType(threadState, (hasSnow ? terrainVariation_snow : grassVariation));
-		if(variationDefaults.materialIndexA != 0)
+		if(variationDefaults.materialIndex != 0)
 		{
-			result.materialIndexA = variationDefaults.materialIndexA;
-			result.materialIndexB = variationDefaults.materialIndexB;
+			result.materialIndex = variationDefaults.materialIndex;
 			result.pathDifficultyMultiplier = variationDefaults.pathDifficultyMultiplier;
 			if(hasSnow)
 			{
@@ -830,11 +828,10 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		}
 	}
 	
-	if(result.materialIndexA == 0)
+	if(result.materialIndex == 0)
 	{
 		SPSurfaceTypeDefault defaults = threadState->getSurfaceDefaultsForBaseType(threadState, result.surfaceBaseType);
-		result.materialIndexA = defaults.materialIndexA;
-		result.materialIndexB = defaults.materialIndexB;
+		result.materialIndex = defaults.materialIndex;
 		result.decalTypeIndex = defaults.decalGroupIndex;
 		result.pathDifficultyMultiplier = defaults.pathDifficultyMultiplier;
 	}
