@@ -119,7 +119,7 @@ MJ_EXPORT SPVec4 spQuatCast(SPMat3* m);
 MJ_EXPORT void spMat3Cast(SPVec4* qP, SPMat3* result);
 MJ_EXPORT SPVec4 spQuatSlerp(SPVec4 a, SPVec4 b, double x);
 
-MJ_EXPORT SPMat3 spMat3Identity();
+MJ_EXPORT SPMat3 spMat3Identity(void);
 MJ_EXPORT SPMat3 spMat3Rotate(SPMat3 m, double angle, SPVec3 axis);
 MJ_EXPORT SPMat3 spMat3Inverse(SPMat3 m);
 MJ_EXPORT SPMat3 spMat3Multiply(SPMat3 a, SPMat3 b);

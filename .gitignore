@@ -12,3 +12,7 @@ build
 SPlugins/Examples/SPVanilla/Linux/lib
 
 workshop.mjl
+
+## User settings
+xcuserdata/
+*.xcworkspacedata
