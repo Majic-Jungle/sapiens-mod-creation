@@ -210,8 +210,8 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 
 
 
-	SPVec3 scaledNoiseLocC = spVec3Mul(noiseLoc, 202.0);
-	double noiseValueC = spNoiseGet(threadState->spNoise1, scaledNoiseLocC, 4);
+	SPVec3 scaledNoiseLocC = spVec3Mul(noiseLoc, 802.0);
+	double noiseValueC = spNoiseGet(threadState->spNoise1, scaledNoiseLocC, 2);
 	//double riverRainfallAddition = (1.0 - pow(riverDistance, 0.05));
 	//riverRainfallAddition = riverRainfallAddition * (0.5 + noiseValueC) * 500.0;
 	double riverRainfallAddition = (1.0 - pow(riverDistance, 0.05));
@@ -303,8 +303,8 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 
 			if(averageTemp < 18.0f && !cliff)
 			{
-				SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 2000.0);
-				double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
+				SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 8000.0);
+				double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
 				if(noiseValue > 0.1)
 				{
 					tagsOut[tagCount++] = biomeTag_verySparseForest;
@@ -402,8 +402,8 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 					}
 
 
-					SPVec3 scaledNoiseLocB = spVec3Mul(noiseLoc, 14501.0);
-					double noiseValueB = spNoiseGet(threadState->spNoise1, scaledNoiseLocB, 4);
+					SPVec3 scaledNoiseLocB = spVec3Mul(noiseLoc, 60501.0);
+					double noiseValueB = spNoiseGet(threadState->spNoise1, scaledNoiseLocB, 2);
 					if(temperatureSummer > noiseValueB * 4.0 + 2.0f)
 					{
 						if(!drySummer)
@@ -545,17 +545,17 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	memset(&surfaceTypeInfo, 0, sizeof(surfaceTypeInfo));
 	getSurfaceTypeInfo(tags, tagCount, seasonIndex, &surfaceTypeInfo);
 
-	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 59999.0);
-	double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4);
+	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 249999.0);
+	double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
 
 
-	SPVec3 scaledNoiseMedScale = spVec3Mul(noiseLoc, 22273.0);
-	double noiseValueMed = spNoiseGet(threadState->spNoise1, scaledNoiseMedScale, 3);
+	SPVec3 scaledNoiseMedScale = spVec3Mul(noiseLoc, 42273.0);
+	double noiseValueMed = spNoiseGet(threadState->spNoise1, scaledNoiseMedScale, 2);
 
 	double soilRichnessNoiseValue = getSoilRichnessNoiseValue(threadState, noiseLoc, steepness, riverDistance);
 
-	SPVec3 scaledNoiseLocLargeScale = spVec3Mul(noiseLoc, 2073.0);
-	double noiseValueLarge = spNoiseGet(threadState->spNoise1, scaledNoiseLocLargeScale, 4);
+	SPVec3 scaledNoiseLocLargeScale = spVec3Mul(noiseLoc, 8073.0);
+	double noiseValueLarge = spNoiseGet(threadState->spNoise1, scaledNoiseLocLargeScale, 2);
 
 	uint32_t fillSurfaceBaseType = 0;
 	if(fillGameObjectTypeIndex != 0)
@@ -1052,8 +1052,8 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 
 					if(forestInfo.forestDensity > 0)
 					{
-						SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 310.0);
-						double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 3);
+						SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 610.0);
+						double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
 
 						if(noiseValue > 0.3)
 						{
@@ -1157,8 +1157,8 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 
 						if(objectCount > 0)
 						{
-							SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 59.0);
-							double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 3);
+							SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 129.0);
+							double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
 
 							if(noiseValue > 0.4)
 							{
@@ -1178,8 +1178,8 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 								}
 							}
 							SPVec3 offset = {0.2,0.1,0.3};
-							scaledNoiseLoc = spVec3Mul(spVec3Add(noiseLookup, offset), 54.2);
-							noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 3); 
+							scaledNoiseLoc = spVec3Mul(spVec3Add(noiseLookup, offset), 124.2);
+							noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2); 
 							if(noiseValue > 0.4)
 							{
 								for(int i = 0; i < objectCount; i++)
@@ -1206,8 +1206,8 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 						steepness,
 						&forestInfo);
 
-					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 200.0);
-					double rawValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 3);
+					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 400.0);
+					double rawValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
 					double rangedFractionValue = rawValue * rawValue * 8.0;
 					if(terrainBaseType == terrainBaseType_gravel)
 					{
@@ -1242,8 +1242,8 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 				else if(level == SP_SUBDIVISIONS - 1)
 				{
 
-					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 2000.0);
-					double rawValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 3);
+					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 4000.0);
+					double rawValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
 					double rangedFractionValue = rawValue * rawValue * 8.0;
 					if(terrainBaseType == terrainBaseType_gravel)
 					{
