@@ -208,25 +208,17 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 	float averageTemp = (temperatureSummer + temperatureWinter) * 0.5f;
 	float temperatureThreshold = averageTemp * 20.0f;
 
-
-
 	SPVec3 scaledNoiseLocC = spVec3Mul(noiseLoc, 802.0);
 	double noiseValueC = spNoiseGet(threadState->spNoise1, scaledNoiseLocC, 2);
 	//double riverRainfallAddition = (1.0 - pow(riverDistance, 0.05));
 	//riverRainfallAddition = riverRainfallAddition * (0.5 + noiseValueC) * 500.0;
-	double riverRainfallAddition = (1.0 - pow(riverDistance, 0.05));
+	double riverRainfallAddition = (1.0 - pow(spMax(riverDistance - 0.01, 0.0), 0.1));
 	riverRainfallAddition = riverRainfallAddition * (1.0 + noiseValueC) * 500.0;
 
 	double annualRainfallWithRiverAddition = annualRainfall + riverRainfallAddition;
 
-	if (rainfallSummer > rainfallWinter * 2.3f)
-	{
-		temperatureThreshold = temperatureThreshold + 280.0f;
-	}
-	else if (rainfallWinter < rainfallSummer * 2.3f)
-	{
-		temperatureThreshold = temperatureThreshold + 140.0f;
-	}
+	double mixFraction = (rainfallSummer - rainfallWinter * 2.3f) * 0.001;
+	temperatureThreshold = spMix(temperatureThreshold, temperatureThreshold + 280.0f,  mixFraction);
 
 	bool cliff = false;
 	if(steepness > 2.0)

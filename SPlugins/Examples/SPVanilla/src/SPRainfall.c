@@ -24,7 +24,7 @@ void spRainfallGet(SPNoise* noise,
 	double noiseValueW = (noiseValue - noiseValueB) * 1.0;
 
 
-	*outRainfall0 = (pregenRainfall0 + noiseValueS * (10.0 + pregenRainfall0 * 1.0)) * worldGenOptions.rainfallMultiplier;// + riverAddition * (4.0 + noiseValueS);
-	*outRainfall1 = (pregenRainfall1 + noiseValueW * (10.0 + pregenRainfall1 * 1.0)) * worldGenOptions.rainfallMultiplier;// + riverAddition * (4.0 + noiseValueW);
+	*outRainfall0 = (pregenRainfall0 + noiseValueS * (10.0 + pregenRainfall0 * 1.0)) * worldGenOptions.rainfallMultiplier;
+	*outRainfall1 = (pregenRainfall1 + noiseValueW * (10.0 + pregenRainfall1 * 1.0)) * worldGenOptions.rainfallMultiplier;
 	
 }
