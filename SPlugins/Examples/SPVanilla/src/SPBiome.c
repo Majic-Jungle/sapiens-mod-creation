@@ -48,8 +48,10 @@ static uint32_t terrainBaseType_poorDirt;
 static uint32_t terrainVariation_snow;
 static uint32_t terrainVariation_temperateGrass;
 static uint32_t terrainVariation_temperateGrassPlentiful;
+static uint32_t terrainVariation_temperateGrassWinter;
 static uint32_t terrainVariation_taigaGrass;
 static uint32_t terrainVariation_mediterraneanGrass;
+static uint32_t terrainVariation_mediterraneanGrassPlentiful;
 static uint32_t terrainVariation_steppeGrass;
 static uint32_t terrainVariation_tropicalRainforestGrass;
 static uint32_t terrainVariation_monsoonGrass;
@@ -121,32 +123,34 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 	biomeTag_cliff = threadState->getBiomeTag(threadState, "cliff");
 	biomeTag_river = threadState->getBiomeTag(threadState, "river");
 
-	terrainBaseType_rock						= threadState->getTerrainBaseTypeIndex(threadState, "rock");
-	terrainBaseType_beachSand					= threadState->getTerrainBaseTypeIndex(threadState, "beachSand");
-	terrainBaseType_gravel						= threadState->getTerrainBaseTypeIndex(threadState, "gravel");
-	terrainBaseType_desertSand					= threadState->getTerrainBaseTypeIndex(threadState, "desertSand");
-	terrainBaseType_ice							= threadState->getTerrainBaseTypeIndex(threadState, "ice");
-	terrainBaseType_desertRedSand				= threadState->getTerrainBaseTypeIndex(threadState, "desertRedSand");
-	terrainBaseType_redRock						= threadState->getTerrainBaseTypeIndex(threadState, "redRock");
-	terrainBaseType_dirt						= threadState->getTerrainBaseTypeIndex(threadState, "dirt");
-	terrainBaseType_richDirt					= threadState->getTerrainBaseTypeIndex(threadState, "richDirt");
-	terrainBaseType_poorDirt					= threadState->getTerrainBaseTypeIndex(threadState, "poorDirt");
-												
-	terrainVariation_snow						= threadState->getTerrainVariation(threadState, "snow");
-	terrainVariation_temperateGrass				= threadState->getTerrainVariation(threadState, "temperateGrass");
-	terrainVariation_temperateGrassPlentiful	= threadState->getTerrainVariation(threadState, "temperateGrassPlentiful");
-	terrainVariation_taigaGrass					= threadState->getTerrainVariation(threadState, "taigaGrass");
-	terrainVariation_mediterraneanGrass			= threadState->getTerrainVariation(threadState, "mediterraneanGrass");
-	terrainVariation_steppeGrass				= threadState->getTerrainVariation(threadState, "steppeGrass");
-	terrainVariation_tropicalRainforestGrass	= threadState->getTerrainVariation(threadState, "tropicalRainforestGrass");
-	terrainVariation_monsoonGrass				= threadState->getTerrainVariation(threadState, "monsoonGrass");
-	terrainVariation_savannaGrass				= threadState->getTerrainVariation(threadState, "savannaGrass");
-	terrainVariation_tundraGrass				= threadState->getTerrainVariation(threadState, "tundraGrass");
-	terrainVariation_flint				        = threadState->getTerrainVariation(threadState, "flint");
-												
-	terrainModifcation_snowRemoved				= threadState->getTerrainModification(threadState, "snowRemoved");
-	terrainModifcation_vegetationRemoved		= threadState->getTerrainModification(threadState, "vegetationRemoved");
-	terrainModifcation_vegetationAdded			= threadState->getTerrainModification(threadState, "vegetationAdded");
+	terrainBaseType_rock							= threadState->getTerrainBaseTypeIndex(threadState, "rock");
+	terrainBaseType_beachSand						= threadState->getTerrainBaseTypeIndex(threadState, "beachSand");
+	terrainBaseType_gravel							= threadState->getTerrainBaseTypeIndex(threadState, "gravel");
+	terrainBaseType_desertSand						= threadState->getTerrainBaseTypeIndex(threadState, "desertSand");
+	terrainBaseType_ice								= threadState->getTerrainBaseTypeIndex(threadState, "ice");
+	terrainBaseType_desertRedSand					= threadState->getTerrainBaseTypeIndex(threadState, "desertRedSand");
+	terrainBaseType_redRock							= threadState->getTerrainBaseTypeIndex(threadState, "redRock");
+	terrainBaseType_dirt							= threadState->getTerrainBaseTypeIndex(threadState, "dirt");
+	terrainBaseType_richDirt						= threadState->getTerrainBaseTypeIndex(threadState, "richDirt");
+	terrainBaseType_poorDirt						= threadState->getTerrainBaseTypeIndex(threadState, "poorDirt");
+													
+	terrainVariation_snow							= threadState->getTerrainVariation(threadState, "snow");
+	terrainVariation_temperateGrass					= threadState->getTerrainVariation(threadState, "temperateGrass");
+	terrainVariation_temperateGrassPlentiful		= threadState->getTerrainVariation(threadState, "temperateGrassPlentiful");
+	terrainVariation_temperateGrassWinter			= threadState->getTerrainVariation(threadState, "temperateGrassWinter");
+	terrainVariation_taigaGrass						= threadState->getTerrainVariation(threadState, "taigaGrass");
+	terrainVariation_mediterraneanGrass				= threadState->getTerrainVariation(threadState, "mediterraneanGrass");
+	terrainVariation_mediterraneanGrassPlentiful	= threadState->getTerrainVariation(threadState, "mediterraneanGrassPlentiful");	
+	terrainVariation_steppeGrass					= threadState->getTerrainVariation(threadState, "steppeGrass");
+	terrainVariation_tropicalRainforestGrass		= threadState->getTerrainVariation(threadState, "tropicalRainforestGrass");
+	terrainVariation_monsoonGrass					= threadState->getTerrainVariation(threadState, "monsoonGrass");
+	terrainVariation_savannaGrass					= threadState->getTerrainVariation(threadState, "savannaGrass");
+	terrainVariation_tundraGrass					= threadState->getTerrainVariation(threadState, "tundraGrass");
+	terrainVariation_flint							= threadState->getTerrainVariation(threadState, "flint");
+													
+	terrainModifcation_snowRemoved					= threadState->getTerrainModification(threadState, "snowRemoved");
+	terrainModifcation_vegetationRemoved			= threadState->getTerrainModification(threadState, "vegetationRemoved");
+	terrainModifcation_vegetationAdded				= threadState->getTerrainModification(threadState, "vegetationAdded");
 
 	if(threadState->getGameObjectTypeIndex) //this function isn't set where game object types aren't required eg. in the initial world creation screen
 	{
@@ -429,7 +433,7 @@ typedef struct SurfaceTypeInfo {
 	int snowDepth;
 } SurfaceTypeInfo;
 
-void getSurfaceTypeInfo(uint16_t* biomeTags, int tagCount, int seasonIndex, SurfaceTypeInfo* surfaceTypeInfo)
+void getSurfaceTypeInfo(uint16_t* biomeTags, int tagCount, int seasonIndex, SurfaceTypeInfo* surfaceTypeInfo, float steepness, double noiseValue)
 {
 	for(int i = 0; i < tagCount; i++)
 	{
@@ -497,6 +501,14 @@ void getSurfaceTypeInfo(uint16_t* biomeTags, int tagCount, int seasonIndex, Surf
 			}
 		}
 	}
+
+	if(surfaceTypeInfo->snowDepth > 0)
+	{
+		if(steepness > 0.2 + noiseValue * 0.5)
+		{
+			surfaceTypeInfo->snowDepth--;
+		}
+	}
 }
 
 uint32_t getBeachSurfaceType(SurfaceTypeInfo* surfaceTypeInfo, float riverDistance, float noiseValue, int16_t digFillOffset)
@@ -535,10 +547,11 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	SurfaceTypeInfo surfaceTypeInfo;
 	SPSurfaceTypeResult result = incomingType;
 	memset(&surfaceTypeInfo, 0, sizeof(surfaceTypeInfo));
-	getSurfaceTypeInfo(tags, tagCount, seasonIndex, &surfaceTypeInfo);
-
-	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 249999.0);
+	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 24999.0);
 	double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
+
+	getSurfaceTypeInfo(tags, tagCount, seasonIndex, &surfaceTypeInfo, steepness, noiseValue);
+
 
 
 	SPVec3 scaledNoiseMedScale = spVec3Mul(noiseLoc, 42273.0);
@@ -739,18 +752,18 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 					}
 					else
 					{
-						grassVariation = terrainVariation_temperateGrass;
+						grassVariation = terrainVariation_mediterraneanGrassPlentiful;
 					}
 				}
 				else
 				{
 					if(soilQuality == 0)
 					{
-						grassVariation = 0;
+						grassVariation = terrainVariation_tundraGrass;
 					}
 					else if(soilQuality == 1)
 					{
-						grassVariation = terrainVariation_tundraGrass;
+						grassVariation = terrainVariation_temperateGrassWinter;
 					}
 					else
 					{
