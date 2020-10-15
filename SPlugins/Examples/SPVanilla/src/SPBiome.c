@@ -504,7 +504,11 @@ void getSurfaceTypeInfo(uint16_t* biomeTags, int tagCount, int seasonIndex, Surf
 
 	if(surfaceTypeInfo->snowDepth > 0)
 	{
-		if(steepness > 0.2 + noiseValue * 0.5)
+		if(steepness > 0.4 + noiseValue * 0.2)
+		{
+			surfaceTypeInfo->snowDepth--;
+		}
+		if(steepness > 0.7 + noiseValue * 0.2)
 		{
 			surfaceTypeInfo->snowDepth--;
 		}
