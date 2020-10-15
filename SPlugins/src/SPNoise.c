@@ -187,6 +187,96 @@ double noise3DPrivate(SPNoise* noise, SPVec3 vec)
 }
 
 
+double noise3DPrivateWithRate(SPNoise* noise, SPVec3 vec, SPVec3* rateOfChange) //this is untested, unused for now.
+{
+	int bx0, bx1, by0, by1, bz0, bz1, b00, b10, b01, b11;
+	double rx0, rx1, ry0, ry1, rz0, rz1, *q, sy, sz, a, b, c, d, t;
+	double uv000, uv100, uv010, uv110, uv001, uv101, uv011, uv111;
+	int i, j;
+
+	double rateA,rateB,rateC, rateD;
+
+	int* p = noise->p;
+	double* g3 = noise->g3;
+
+	setup(vec.x,bx0,bx1,rx0,rx1);
+	setup(vec.y,by0,by1,ry0,ry1);
+	setup(vec.z,bz0,bz1,rz0,rz1);
+
+	i = p[ bx0 ];
+	j = p[ bx1 ];
+
+	b00 = p[ i + by0 ];
+	b10 = p[ j + by0 ];
+	b01 = p[ i + by1 ];
+	b11 = p[ j + by1 ];
+
+	t  = s_curve(rx0);
+	sy = s_curve(ry0);
+	sz = s_curve(rz0);
+
+#define at3(rx,ry,rz) ( rx * q[0] + ry * q[1] + rz * q[2] )
+
+	q = &(g3[ (b00 + bz0) * 3 ]) ; uv000 = at3(rx0,ry0,rz0);
+	q = &(g3[ (b10 + bz0) * 3 ]) ; uv100 = at3(rx1,ry0,rz0);
+	a = lerp(t, uv000, uv100);
+
+	q = &(g3[ (b01 + bz0) * 3 ]); uv010 = at3(rx0,ry1,rz0);
+	q = &(g3[ (b11 + bz0) * 3 ]); uv110 = at3(rx1,ry1,rz0);
+	b = lerp(t, uv010, uv110);
+
+	c = lerp(sy, a, b);
+
+	q = &(g3[ (b00 + bz1) * 3 ]); uv001 = at3(rx0,ry0,rz1);
+	q = &(g3[ (b10 + bz1) * 3 ]); uv101 = at3(rx1,ry0,rz1);
+	a = lerp(t, uv001, uv101);
+
+	q = &(g3[ (b01 + bz1) * 3 ]); uv011 = at3(rx0,ry1,rz1);
+	q = &(g3[ (b11 + bz1) * 3 ]); uv111 = at3(rx1,ry1,rz1);
+	b = lerp(t, uv011, uv111);
+
+	d = lerp(sy, a, b);
+
+	rateA = fabs(uv100-uv000);
+	rateB = fabs(uv110-uv010);
+
+	rateC = lerp(sy, rateA, rateB);
+
+	rateA = fabs(uv101-uv001);
+	rateB = fabs(uv111-uv011);
+
+	rateD = lerp(sy, rateA, rateB);
+
+	(*rateOfChange).x = lerp(sz, rateC, rateD);
+
+
+	rateA = fabs(uv010-uv000);
+	rateB = fabs(uv110-uv100);
+
+	rateC = lerp(t, rateA, rateB);
+
+	rateA = fabs(uv011-uv001);
+	rateB = fabs(uv111-uv101);
+
+	rateD = lerp(sz, rateA, rateB);
+
+	(*rateOfChange).y = lerp(sz, rateC, rateD);
+
+	rateA = fabs(uv001-uv000);
+	rateB = fabs(uv101-uv100);
+
+	rateC = lerp(t, rateA, rateB);
+
+	rateA = fabs(uv011-uv010);
+	rateB = fabs(uv111-uv110);
+
+	rateD = lerp(t, rateA, rateB);
+
+	(*rateOfChange).z = lerp(sy, rateC, rateD);
+
+	return lerp(sz, c, d);
+}
+
 double spNoiseGet(SPNoise* noise, SPVec3 vec, int endOctave)
 {
 	if(endOctave <= 1)
@@ -199,6 +289,33 @@ double spNoiseGet(SPNoise* noise, SPVec3 vec, int endOctave)
 	for(int i = 0; i<endOctave; i++ )
 	{
 		result += noise3DPrivate(noise, vec) * amp;
+		vec.x *= 2.0;
+		vec.y *= 2.0;
+		vec.z *= 2.0;
+		amp*=noise->persistance;
+	}
+
+	return result;
+}
+
+double spNoiseGetWithChangeRate(SPNoise* noise, SPVec3 vec, int endOctave, SPVec3* rateOfChange) //this is untested, unused for now.
+{
+	if(endOctave <= 1)
+	{
+		return noise3DPrivateWithRate(noise, vec, rateOfChange);
+	}
+	double result = 0.0;
+	double amp = 1.0;
+
+	for(int i = 0; i<endOctave; i++ )
+	{
+		SPVec3 thisRateOfChange;
+		result += noise3DPrivateWithRate(noise, vec, &thisRateOfChange) * amp;
+
+		(*rateOfChange).x = (*rateOfChange).x + thisRateOfChange.x * amp;
+		(*rateOfChange).y = (*rateOfChange).y + thisRateOfChange.y * amp;
+		(*rateOfChange).z = (*rateOfChange).z + thisRateOfChange.z * amp;
+
 		vec.x *= 2.0;
 		vec.y *= 2.0;
 		vec.z *= 2.0;
