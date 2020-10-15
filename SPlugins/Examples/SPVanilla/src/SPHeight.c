@@ -73,16 +73,9 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 	double value = (continents) * (0.1 + mountainSupressionA) + spMax(mountainRanges * mountainSupressionA + (mountainTopRoughnessMid * 0.01 * mountainSupressionA), 0.0) - 0.05;
 	double valueB = mountainSupressionB;//MAX(mountainRanges * mountainSupressionB + (mountainTopRoughnessMid * 0.01 * mountainSupressionB), 0.0);
 
-	//SPVec4 resultDebug = {(spMax(mountainRanges * mountainSupressionA + (mountainTopRoughnessMid * 0.01 * mountainSupressionA), 0.0) - 0.05) * TERRAIN_HEIGHT_MAXISH, riverDistance, 0.0, 0.0};
-	//return resultDebug;
-	 
 
-	/*double riverPlaneLevelNoiseValue = spNoiseGet(noise1, spVec3Mul(p, 14.0), 2);
-	double riverPlaneLevel = spMax(0.0001 + 0.03 * riverPlaneLevelNoiseValue, 0.000001);
-	if(riverDistance > riverPlaneLevel)
-	{
-		riverDistance = spMax(riverDistance - 0.01, 0.0) / (1.0 - 0.01) + riverPlaneLevel;
-	}*/
+	riverDistance = (riverDistance - 0.000001) / (1.0 - 0.000001);
+	riverDistance = spMax(riverDistance, 0.0);
 
 	double valleyShapePower = spNoiseGet(noise1, spVec3Mul(p, 8.1), 1);
 	riverDistance = pow(riverDistance, 1.0 + valleyShapePower);
@@ -90,13 +83,9 @@ SPVec4 spHeightGet(SPVec4 previousHeight, //if spReplacesPreviousHeight returns 
 
 	value *= TERRAIN_HEIGHT_MAXISH;
 
-
-	double valleyDistanceAtLowAltitudesMultiplierA = spNoiseGet(noise1, spVec3Mul(pz, 5.5), 3);
-	valleyDistanceAtLowAltitudesMultiplierA = spMax(valleyDistanceAtLowAltitudesMultiplierA, -0.2);
-	double valleyDistanceAtLowAltitudesMultiplierB = fabs(spNoiseGet(noise1, spVec3Mul(pz, 40.5), 3));
-	valleyDistanceAtLowAltitudesMultiplierB = spClamp(valleyDistanceAtLowAltitudesMultiplierB * 2.0, 0.0, 1.0);
-
-	riverDistance = riverDistance * (1.0 + spSmoothStep(1.0, 0.0, value * 20000.0 + valleyDistanceAtLowAltitudesMultiplierA * 2.0) * 100.0 * valleyDistanceAtLowAltitudesMultiplierB);
+	SPVec3 riverDistanceNoiseBase = {riverValue * 100.0, 0.34, 0.45};
+	double valleyDistanceAtLowAltitudesMultiplier = abs(spNoiseGet(noise1, riverDistanceNoiseBase, 3));
+	riverDistance = riverDistance * (1.0 + spSmoothStep(1.0, 0.0, 0.4 + valleyDistanceAtLowAltitudesMultiplier + value * 10000.0) * 50.0);
 	riverDistance = spMin(riverDistance, 1.0);
 
 
