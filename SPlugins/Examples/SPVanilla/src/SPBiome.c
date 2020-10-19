@@ -35,6 +35,7 @@ static uint16_t biomeTag_cliff;
 static uint16_t biomeTag_river;
 
 static uint32_t terrainBaseType_rock;
+static uint32_t terrainBaseType_limestone;
 static uint32_t terrainBaseType_beachSand;
 static uint32_t terrainBaseType_gravel;
 static uint32_t terrainBaseType_desertSand;
@@ -57,6 +58,7 @@ static uint32_t terrainVariation_tropicalRainforestGrass;
 static uint32_t terrainVariation_monsoonGrass;
 static uint32_t terrainVariation_savannaGrass;
 static uint32_t terrainVariation_tundraGrass;
+static uint32_t terrainVariation_limestone;
 static uint32_t terrainVariation_flint;
 
 static uint32_t terrainModifcation_snowRemoved;
@@ -74,7 +76,11 @@ static uint32_t gameObjectType_tallPine;
 static uint32_t gameObjectType_beetrootPlant;
 
 static uint32_t gameObjectType_rock;
-static uint32_t gameObjectType_smallRock;
+static uint32_t gameObjectType_rockSmall;
+static uint32_t gameObjectType_rockLarge;
+static uint32_t gameObjectType_limestoneRock;
+static uint32_t gameObjectType_limestoneRockSmall;
+static uint32_t gameObjectType_limestoneRockLarge;
 static uint32_t gameObjectType_flint;
 static uint32_t gameObjectType_birchBranch;
 static uint32_t gameObjectType_pineBranch;
@@ -124,6 +130,7 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 	biomeTag_river = threadState->getBiomeTag(threadState, "river");
 
 	terrainBaseType_rock							= threadState->getTerrainBaseTypeIndex(threadState, "rock");
+	terrainBaseType_limestone						= threadState->getTerrainBaseTypeIndex(threadState, "limestone");
 	terrainBaseType_beachSand						= threadState->getTerrainBaseTypeIndex(threadState, "beachSand");
 	terrainBaseType_gravel							= threadState->getTerrainBaseTypeIndex(threadState, "gravel");
 	terrainBaseType_desertSand						= threadState->getTerrainBaseTypeIndex(threadState, "desertSand");
@@ -147,6 +154,7 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 	terrainVariation_savannaGrass					= threadState->getTerrainVariation(threadState, "savannaGrass");
 	terrainVariation_tundraGrass					= threadState->getTerrainVariation(threadState, "tundraGrass");
 	terrainVariation_flint							= threadState->getTerrainVariation(threadState, "flint");
+	terrainVariation_limestone						= threadState->getTerrainVariation(threadState, "limestone");
 													
 	terrainModifcation_snowRemoved					= threadState->getTerrainModification(threadState, "snowRemoved");
 	terrainModifcation_vegetationRemoved			= threadState->getTerrainModification(threadState, "vegetationRemoved");
@@ -165,7 +173,11 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 		gameObjectType_beetrootPlant = threadState->getGameObjectTypeIndex(threadState, "beetrootPlant");
 
 		gameObjectType_rock = threadState->getGameObjectTypeIndex(threadState, "rock");
-		gameObjectType_smallRock = threadState->getGameObjectTypeIndex(threadState, "smallRock");
+		gameObjectType_rockSmall = threadState->getGameObjectTypeIndex(threadState, "rockSmall");
+		gameObjectType_limestoneRockSmall = threadState->getGameObjectTypeIndex(threadState, "limestoneRockSmall");
+		gameObjectType_rockLarge = threadState->getGameObjectTypeIndex(threadState, "rockLarge");
+		gameObjectType_limestoneRock = threadState->getGameObjectTypeIndex(threadState, "limestoneRock");
+		gameObjectType_limestoneRockLarge = threadState->getGameObjectTypeIndex(threadState, "limestoneRockLarge");
 		gameObjectType_flint = threadState->getGameObjectTypeIndex(threadState, "flint");
 		gameObjectType_birchBranch = threadState->getGameObjectTypeIndex(threadState, "birchBranch");
 		gameObjectType_pineBranch = threadState->getGameObjectTypeIndex(threadState, "pineBranch");
@@ -603,6 +615,8 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	bool isBeach = ((altitude + noiseValue * 0.00000005 + noiseValueLarge * 0.0000005) < 0.0000001);
 	bool isRock = (steepness > rockSteepness + noiseValue * 0.5);
 
+	bool isLimestone = (noiseValueMed > 0.2 && noiseValue < 0.1);
+
 	if(digFillOffset != 0 && !isRock)
 	{
 		if(digFillOffset < (noiseValue * 4) - 2)
@@ -633,6 +647,10 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		if(isRock)
 		{
 			result.surfaceBaseType = terrainBaseType_rock;
+			if(isLimestone)
+			{
+				result.surfaceBaseType = terrainBaseType_limestone;
+			}
 		}
 		else if(isBeach)
 		{
@@ -795,9 +813,13 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	}
 
 
-	if(noiseValueMed > 0.3 && soilRichnessNoiseValue < 0.1 && noiseValue < 0.0)
+	if(isLimestone)
 	{
-		variations[result.variationCount++] = terrainVariation_flint;
+		variations[result.variationCount++] = terrainVariation_limestone;
+		if(noiseValueMed > 0.3 && soilRichnessNoiseValue < 0.1 && noiseValue < -0.1)
+		{
+			variations[result.variationCount++] = terrainVariation_flint;
+		}
 	}
 
 
@@ -1204,6 +1226,39 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 								}
 							}
 						}
+
+						SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 400.0);
+						double rawValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
+						double rangedFractionValue = rawValue * rawValue * 8.0;
+						if(terrainBaseType == terrainBaseType_gravel)
+						{
+							rangedFractionValue += 1.0;
+						}
+						else if(forestInfo.river)
+						{
+							rangedFractionValue += 0.5;
+						}
+						int rockObjectCount = ((int)spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 1324, 20)) - 20 + 4 * rangedFractionValue;
+						if(rockObjectCount > 2)
+						{
+							uint32_t rockType = gameObjectType_rockLarge;
+							for(int i = 0; i < variationCount; i++)
+							{
+								if(variations[i] == terrainVariation_limestone)
+								{
+									rockType = gameObjectType_limestoneRockLarge;
+								}
+							}
+
+							bool addBoulderCount = (spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 83637, 80) - 60 + 50 * rangedFractionValue);
+							if(addBoulderCount > 0)
+							{
+								for(int i = 0; i < addBoulderCount; i++)
+								{
+									ADD_OBJECT(rockType);
+								}
+							}
+						}
 					}
 				}
 				else if(level == SP_SUBDIVISIONS - 2)
@@ -1227,9 +1282,21 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 						rangedFractionValue += 0.5;
 					}
 					int objectCount = ((int)spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 1324, 20)) - 20 + 4 * rangedFractionValue;
-					for(int i = 0; i < objectCount; i++)
+					if(objectCount > 0)
 					{
-						ADD_OBJECT(gameObjectType_rock);
+						uint32_t rockType = gameObjectType_rock;
+						for(int i = 0; i < variationCount; i++)
+						{
+							if(variations[i] == terrainVariation_limestone)
+							{
+								rockType = gameObjectType_limestoneRock;
+							}
+						}
+
+						for(int i = 0; i < objectCount; i++)
+						{
+							ADD_OBJECT(rockType);
+						}
 					}
 
 					if(forestInfo.forestDensity > 0)
@@ -1268,27 +1335,22 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 					{
 						if(objectCount > 0)
 						{
-							uint32_t oreType = 0;
+							uint32_t rockType = gameObjectType_rockSmall;
 							for(int i = 0; i < variationCount; i++)
 							{
 								if(variations[i] == terrainVariation_flint)
 								{
-									oreType = gameObjectType_flint;
+									rockType = gameObjectType_flint;
+								}
+								else if(variations[i] == terrainVariation_limestone)
+								{
+									rockType = gameObjectType_limestoneRockSmall;
 								}
 							}
-							if(oreType != 0)
+
+							for(int i = 0; i < objectCount; i++)
 							{
-								for(int i = 0; i < objectCount; i++)
-								{
-									ADD_OBJECT(oreType);
-								}
-							}
-							else
-							{
-								for(int i = 0; i < objectCount; i++)
-								{
-									ADD_OBJECT(gameObjectType_smallRock);
-								}
+								ADD_OBJECT(rockType);
 							}
 						}
 
