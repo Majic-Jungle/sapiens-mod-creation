@@ -13,6 +13,7 @@ typedef void (* SPRainfallGetFunc) (SPNoise* noise,
 	double riverDistance, 
 	double pregenRainfall0, 
 	double pregenRainfall1,
+	double altitude,
 	double* outRainfall0,
 	double* outRainfall1);
 
@@ -23,6 +24,7 @@ MJ_EXPORT void spRainfallGet(SPNoise* noise,
 	double riverDistance, 
 	double pregenRainfall0, 
 	double pregenRainfall1,
+	double altitude,
 	double* outRainfall0,
 	double* outRainfall1);
 

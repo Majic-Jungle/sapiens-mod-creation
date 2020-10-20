@@ -233,8 +233,8 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 
 	double annualRainfallWithRiverAddition = annualRainfall + riverRainfallAddition;
 
-	double mixFraction = (rainfallSummer - rainfallWinter * 2.3f) * 0.001;
-	temperatureThreshold = spMix(temperatureThreshold, temperatureThreshold + 280.0f,  mixFraction);
+	double mixFraction = (rainfallSummer - rainfallWinter * 2.3f) * 0.00001;
+	temperatureThreshold = spMix(temperatureThreshold, temperatureThreshold + 200.0f,  mixFraction);
 
 	bool cliff = false;
 	if(steepness > 2.0)
