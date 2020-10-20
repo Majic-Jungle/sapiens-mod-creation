@@ -1144,6 +1144,37 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 							ADD_OBJECT(gameObjectType_smallPine);
 						}
 					}
+
+					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 400.0);
+					double rawValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
+					double rangedFractionValue = rawValue * rawValue * 8.0;
+					if(terrainBaseType == terrainBaseType_gravel)
+					{
+						rangedFractionValue += 1.0;
+					}
+					else if(forestInfo.river)
+					{
+						rangedFractionValue += 0.5;
+					}
+
+					int addBoulderCount = (spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 83637, 60) - 58 + 5 * rangedFractionValue);
+					if(addBoulderCount > 0)
+					{
+						uint32_t rockType = gameObjectType_rockLarge;
+						for(int i = 0; i < variationCount; i++)
+						{
+							if(variations[i] == terrainVariation_limestone)
+							{
+								rockType = gameObjectType_limestoneRockLarge;
+							}
+						}
+
+						for(int i = 0; i < addBoulderCount; i++)
+						{
+							ADD_OBJECT(rockType);
+						}
+					}
+
 				}
 				else if(level == SP_SUBDIVISIONS - 3)
 				{
@@ -1223,39 +1254,6 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 								for(int i = 0; i < objectCount; i++)
 								{
 									ADD_OBJECT(gameObjectType_beetrootPlant);
-								}
-							}
-						}
-
-						SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 400.0);
-						double rawValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
-						double rangedFractionValue = rawValue * rawValue * 8.0;
-						if(terrainBaseType == terrainBaseType_gravel)
-						{
-							rangedFractionValue += 1.0;
-						}
-						else if(forestInfo.river)
-						{
-							rangedFractionValue += 0.5;
-						}
-						int rockObjectCount = ((int)spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 1324, 20)) - 20 + 4 * rangedFractionValue;
-						if(rockObjectCount > 2)
-						{
-							uint32_t rockType = gameObjectType_rockLarge;
-							for(int i = 0; i < variationCount; i++)
-							{
-								if(variations[i] == terrainVariation_limestone)
-								{
-									rockType = gameObjectType_limestoneRockLarge;
-								}
-							}
-
-							bool addBoulderCount = (spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 83637, 80) - 60 + 50 * rangedFractionValue);
-							if(addBoulderCount > 0)
-							{
-								for(int i = 0; i < addBoulderCount; i++)
-								{
-									ADD_OBJECT(rockType);
 								}
 							}
 						}
