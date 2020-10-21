@@ -45,6 +45,7 @@ static uint32_t terrainBaseType_redRock;
 static uint32_t terrainBaseType_dirt;
 static uint32_t terrainBaseType_richDirt;
 static uint32_t terrainBaseType_poorDirt;
+static uint32_t terrainBaseType_clay;
 
 static uint32_t terrainVariation_snow;
 static uint32_t terrainVariation_temperateGrass;
@@ -60,6 +61,7 @@ static uint32_t terrainVariation_savannaGrass;
 static uint32_t terrainVariation_tundraGrass;
 static uint32_t terrainVariation_limestone;
 static uint32_t terrainVariation_flint;
+static uint32_t terrainVariation_clay;
 
 static uint32_t terrainModifcation_snowRemoved;
 static uint32_t terrainModifcation_vegetationRemoved;
@@ -74,6 +76,7 @@ static uint32_t gameObjectType_raspberryBush;
 static uint32_t gameObjectType_gooseberryBush;
 static uint32_t gameObjectType_tallPine;
 static uint32_t gameObjectType_beetrootPlant;
+static uint32_t gameObjectType_wheatPlant;
 
 static uint32_t gameObjectType_rock;
 static uint32_t gameObjectType_rockSmall;
@@ -140,6 +143,7 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 	terrainBaseType_dirt							= threadState->getTerrainBaseTypeIndex(threadState, "dirt");
 	terrainBaseType_richDirt						= threadState->getTerrainBaseTypeIndex(threadState, "richDirt");
 	terrainBaseType_poorDirt						= threadState->getTerrainBaseTypeIndex(threadState, "poorDirt");
+	terrainBaseType_clay							= threadState->getTerrainBaseTypeIndex(threadState, "clay");
 													
 	terrainVariation_snow							= threadState->getTerrainVariation(threadState, "snow");
 	terrainVariation_temperateGrass					= threadState->getTerrainVariation(threadState, "temperateGrass");
@@ -154,6 +158,7 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 	terrainVariation_savannaGrass					= threadState->getTerrainVariation(threadState, "savannaGrass");
 	terrainVariation_tundraGrass					= threadState->getTerrainVariation(threadState, "tundraGrass");
 	terrainVariation_flint							= threadState->getTerrainVariation(threadState, "flint");
+	terrainVariation_clay							= threadState->getTerrainVariation(threadState, "clay");
 	terrainVariation_limestone						= threadState->getTerrainVariation(threadState, "limestone");
 													
 	terrainModifcation_snowRemoved					= threadState->getTerrainModification(threadState, "snowRemoved");
@@ -171,6 +176,7 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 		gameObjectType_raspberryBush = threadState->getGameObjectTypeIndex(threadState, "raspberryBush");
 		gameObjectType_gooseberryBush = threadState->getGameObjectTypeIndex(threadState, "gooseberryBush");
 		gameObjectType_beetrootPlant = threadState->getGameObjectTypeIndex(threadState, "beetrootPlant");
+		gameObjectType_wheatPlant = threadState->getGameObjectTypeIndex(threadState, "wheatPlant");
 
 		gameObjectType_rock = threadState->getGameObjectTypeIndex(threadState, "rock");
 		gameObjectType_rockSmall = threadState->getGameObjectTypeIndex(threadState, "rockSmall");
@@ -437,6 +443,7 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 }
 
 #define rockSteepness 2.0
+#define claySteepness 1.6
 
 
 typedef struct SurfaceTypeInfo {
@@ -612,8 +619,11 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		}
 	}
 
+	bool hasClay = (noiseValueMed > 0.0 && noiseValue < 0.2);
+
 	bool isBeach = ((altitude + noiseValue * 0.00000005 + noiseValueLarge * 0.0000005) < 0.0000001);
 	bool isRock = (steepness > rockSteepness + noiseValue * 0.5);
+	bool isClay = hasClay && !isRock && (steepness > claySteepness + noiseValue * 0.5 - (1.0 - riverDistance) * (1.0 - riverDistance) * 0.5);
 
 	bool isLimestone = (noiseValueMed > 0.2 && noiseValue < 0.1);
 
@@ -623,7 +633,15 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		{
 			isRock = true;
 		}
+		else if(hasClay && !isClay)
+		{
+			if(digFillOffset < (noiseValueMed * 4) - 1)
+			{
+				isClay = true;
+			}
+		}
 	}
+
 
 
 	int soilQuality = 1;
@@ -651,6 +669,10 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 			{
 				result.surfaceBaseType = terrainBaseType_limestone;
 			}
+		}
+		else if(isClay)
+		{
+			result.surfaceBaseType = terrainBaseType_clay;
 		}
 		else if(isBeach)
 		{
@@ -684,7 +706,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 				{
 					result.surfaceBaseType = terrainBaseType_redRock;
 				}
-				else
+				else if(!isClay)
 				{
 					if(surfaceTypeInfo.hot)
 					{
@@ -700,7 +722,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 			{
 				if(surfaceTypeInfo.hot)
 				{
-					if(isRock)
+					if(isRock && !isClay)
 					{
 						result.surfaceBaseType = terrainBaseType_redRock;
 					}
@@ -708,7 +730,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 			}
 			else if(tags[i] == biomeTag_icecap)
 			{
-				if(!isRock)
+				if(!isRock && !isClay)
 				{
 					result.surfaceBaseType = terrainBaseType_ice;
 				}
@@ -718,7 +740,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 
 	uint32_t grassVariation = 0;
 
-	if (!vegetationRemoved && (!isRock && !isBeach))
+	if (!vegetationRemoved && (!isRock && !isBeach && !isClay))
 	{
 		for (int i = 0; i < tagCount; i++)
 		{
@@ -820,6 +842,11 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		{
 			variations[result.variationCount++] = terrainVariation_flint;
 		}
+	}
+
+	if(hasClay)
+	{
+		variations[result.variationCount++] = terrainVariation_clay;
 	}
 
 
@@ -1254,6 +1281,16 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 								for(int i = 0; i < objectCount; i++)
 								{
 									ADD_OBJECT(gameObjectType_beetrootPlant);
+								}
+							}
+							SPVec3 offsetB = {0.6,0.22,0.5};
+							scaledNoiseLoc = spVec3Mul(spVec3Add(noiseLookup, offsetB), 134.7);
+							noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2); 
+							if(noiseValue > 0.4)
+							{
+								for(int i = 0; i < objectCount; i++)
+								{
+									ADD_OBJECT(gameObjectType_wheatPlant);
 								}
 							}
 						}
