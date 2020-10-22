@@ -173,6 +173,11 @@ SPVec4 spVec4Neg(SPVec4 a)
 	return result;
 }
 
+SPVec4 spVec4Normalize(SPVec4 v)
+{
+	return spVec4Div(v, sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w));
+}
+
 
 SPVec4 spQuatCast(SPMat3* m3)
 {
@@ -488,7 +493,7 @@ SPMat3 spMat3Multiply(SPMat3 a, SPMat3 b)
 
 SPMat3 spMat3Slerp(SPMat3 a, SPMat3 b, double fraction)
 {
-	SPVec4 slerpedQuat = spQuatSlerp(spQuatCast(&a), spQuatCast(&b), spClamp(fraction, 0.0, 1.0));
+	SPVec4 slerpedQuat = spVec4Normalize(spQuatSlerp(spQuatCast(&a), spQuatCast(&b), spClamp(fraction, 0.0, 1.0)));
 	SPMat3 result;
 	spMat3Cast(&slerpedQuat, &result);
 	return result;
@@ -496,7 +501,7 @@ SPMat3 spMat3Slerp(SPMat3 a, SPMat3 b, double fraction)
 
 void spMat3SlerpPtr(SPMat3* a, SPMat3* b, double fraction, SPMat3* result)
 {
-	SPVec4 slerpedQuat = spQuatSlerp(spQuatCast(a), spQuatCast(b), spClamp(fraction, 0.0, 1.0));
+	SPVec4 slerpedQuat = spVec4Normalize(spQuatSlerp(spQuatCast(a), spQuatCast(b), spClamp(fraction, 0.0, 1.0)));
 	spMat3Cast(&slerpedQuat, result);
 }
 

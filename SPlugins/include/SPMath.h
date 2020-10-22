@@ -115,6 +115,8 @@ MJ_EXPORT double spVec3Distance(SPVec3 a, SPVec3 b);
 MJ_EXPORT double spVec3Distance2(SPVec3 a, SPVec3 b);
 MJ_EXPORT SPVec3 spVec3xMat3(SPVec3 v, SPMat3 m);
 
+MJ_EXPORT SPVec4 spVec4Normalize(SPVec4 v);
+
 MJ_EXPORT SPVec4 spQuatCast(SPMat3* m);
 MJ_EXPORT void spMat3Cast(SPVec4* qP, SPMat3* result);
 MJ_EXPORT SPVec4 spQuatSlerp(SPVec4 a, SPVec4 b, double x);
