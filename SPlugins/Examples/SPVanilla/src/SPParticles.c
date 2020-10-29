@@ -219,17 +219,18 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 		for(int i = 0; i < 128; i++)
 		{
 			SPParticleState state;
-			SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(30000.0));
+			SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(120000.0));
 			SPVec3 offsetVec = spVec3Add(normalizedPos, randPosVec);
 			double offsetLength = spVec3Length(offsetVec);
 			SPVec3 randPosNormal = spVec3Div(offsetVec, offsetLength);
 
-			state.p = spVec3Mul(randPosNormal, 1.0 + SP_METERS_TO_PRERENDER(1000.0));
+			state.p = spVec3Mul(randPosNormal, 1.0 + SP_METERS_TO_PRERENDER(1200.0));
 			state.v = zeroVec;
 			state.particleTextureType = 0;
 			state.lifeLeft = 1.0;
 			state.randomValueA = spRandGetValue(spRand);
 			state.gravity = zeroVec;
+			state.scale = 1.0;
 
 			(*threadState->addParticle)(threadState->particleManager,
 				emitterState,
