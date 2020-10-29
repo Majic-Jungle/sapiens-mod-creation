@@ -18,6 +18,8 @@ typedef struct SPParticleRenderGroupInfo {
 	uint32_t localID;
 	int vertexDescriptionTypeCount;
 	int* vertexDescriptionTypes;
+	char* textureNameA;
+	char* textureNameB;
 } SPParticleRenderGroupInfo;
 
 typedef struct SPParticleEmitterTypeInfo {

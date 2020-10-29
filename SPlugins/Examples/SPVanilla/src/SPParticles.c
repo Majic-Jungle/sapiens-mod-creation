@@ -11,7 +11,8 @@ enum {
 	sp_vanillaEmitterTypeTorchLarge,
 	sp_vanillaEmitterTypeTorchSmall,
 	sp_vanillaEmitterTypeWoodChop,
-	sp_vanillaEmitterTypeFeathers
+	sp_vanillaEmitterTypeFeathers,
+	sp_vanillaEmitterTypeClouds
 };
 
 enum {
@@ -19,13 +20,14 @@ enum {
 	sp_vanillaRenderGroupFire,
 	sp_vanillaRenderGroupStandard,
 	sp_vanillaRenderGroupSpark,
+	sp_vanillaRenderGroupCloud,
 };
 
 
 //define emitter types that we wish to override or add. Vanilla functions and functions for mods with earlier order indexes than this one that override the same type, will not get called.
 //Mods with later order indexes than this mod will win, so it's possible that even though you define behavior in the functions here, those functions may not actually get called..
 
-#define EMITTER_TYPES_COUNT 7
+#define EMITTER_TYPES_COUNT 8
 static SPParticleEmitterTypeInfo particleEmitterTypeInfos[EMITTER_TYPES_COUNT] = {
 	{
 		"campfireLarge",
@@ -54,6 +56,10 @@ static SPParticleEmitterTypeInfo particleEmitterTypeInfos[EMITTER_TYPES_COUNT] =
 	{
 		"feathers",
 		sp_vanillaEmitterTypeFeathers
+	},
+	{
+		"clouds",
+		sp_vanillaEmitterTypeClouds
 	}
 };
 
@@ -66,31 +72,47 @@ static int vertexDescriptionTypes[VERTEX_ATTRIBUTE_COUNT] = {
 };
 
 //define render groups that we wish to use, override or add. To use an existing/predefined render group, either define again or set vertexDescriptionTypeCount to 0
-#define RENDER_GROUP_TYPES_COUNT 4
+#define RENDER_GROUP_TYPES_COUNT 5
 static SPParticleRenderGroupInfo renderGroupInfos[RENDER_GROUP_TYPES_COUNT] = {
 	{
 		"smokeParticle",
 		sp_vanillaRenderGroupSmoke,
 		VERTEX_ATTRIBUTE_COUNT,
-		vertexDescriptionTypes
+		vertexDescriptionTypes,
+		"img/particles.png",
+		NULL
 	},
 	{
 		"fireParticle",
 		sp_vanillaRenderGroupFire,
 		VERTEX_ATTRIBUTE_COUNT,
-		vertexDescriptionTypes
+		vertexDescriptionTypes,
+		"img/particles.png",
+		NULL
 	},
 	{
 		"particle",
 		sp_vanillaRenderGroupStandard,
 		VERTEX_ATTRIBUTE_COUNT,
-		vertexDescriptionTypes
+		vertexDescriptionTypes,
+		"img/particles.png",
+		NULL
 	},
 	{ 
 		"spark",
 		sp_vanillaRenderGroupSpark,
 		VERTEX_ATTRIBUTE_COUNT,
-		vertexDescriptionTypes
+		vertexDescriptionTypes,
+		"img/particles.png",
+		NULL
+	},
+	{ 
+		"cloud",
+		sp_vanillaRenderGroupCloud,
+		VERTEX_ATTRIBUTE_COUNT,
+		vertexDescriptionTypes,
+		"img/cloudsN.png",
+		"img/cloudsP.png",
 	}
 };
 
@@ -187,6 +209,35 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 				&state);
 		}
 	}
+	case sp_vanillaEmitterTypeClouds:
+	{
+		double posLength = spVec3Length(emitterState->p);
+		SPVec3 normalizedPos = spVec3Div(emitterState->p, posLength);
+		SPVec3 zeroVec = {0,0,0};
+
+
+		for(int i = 0; i < 128; i++)
+		{
+			SPParticleState state;
+			SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(30000.0));
+			SPVec3 offsetVec = spVec3Add(normalizedPos, randPosVec);
+			double offsetLength = spVec3Length(offsetVec);
+			SPVec3 randPosNormal = spVec3Div(offsetVec, offsetLength);
+
+			state.p = spVec3Mul(randPosNormal, 1.0 + SP_METERS_TO_PRERENDER(1000.0));
+			state.v = zeroVec;
+			state.particleTextureType = 0;
+			state.lifeLeft = 1.0;
+			state.randomValueA = spRandGetValue(spRand);
+			state.gravity = zeroVec;
+
+			(*threadState->addParticle)(threadState->particleManager,
+				emitterState,
+				sp_vanillaRenderGroupCloud,
+				&state);
+		}
+	}
+	break;
 
 		break;
 	}
@@ -379,11 +430,11 @@ void spUpdateEmitter(SPParticleThreadState* threadState,
 					scaleAverage,
 					randPosVec);
 
-				emitterState->counters[3] = 2 + (uint8_t)(10 * spRandGetValue(spRand) / quantityMultiplier);
+				emitterState->counters[3] = 3 + (uint8_t)(10 * spRandGetValue(spRand) / quantityMultiplier);
 			}
 			else 
 			{
-				if(emitterState->counters[3] == 8 / quantityMultiplier) //spark
+				if(emitterState->counters[3] == 6 / quantityMultiplier) //spark
 				{
 
 					double posLength = spVec3Length(emitterState->p);
@@ -432,6 +483,26 @@ bool spUpdateParticle(SPParticleThreadState* threadState,
 	SPVec3 origin, 
 	float* renderBuffer)
 {
+	if(localRenderGroupTypeID == sp_vanillaRenderGroupCloud)
+	{
+
+		SPVec3 posLocal = spVec3Mul(spVec3Sub(particleState->p, origin), SP_RENDER_SCALE);
+		for(int v = 0; v < 4; v++)
+		{
+			renderBuffer[v * 9 + 0] = posLocal.x;
+			renderBuffer[v * 9 + 1] = posLocal.y;
+			renderBuffer[v * 9 + 2] = posLocal.z;
+			renderBuffer[v * 9 + 3] = texCoords[v].x;
+			renderBuffer[v * 9 + 4] = texCoords[v].y;
+			renderBuffer[v * 9 + 5] = particleState->particleTextureType;
+			renderBuffer[v * 9 + 6] = particleState->lifeLeft;
+			renderBuffer[v * 9 + 7] = particleState->randomValueA;
+			renderBuffer[v * 9 + 8] = particleState->scale;
+		}
+
+		return true;
+	}
+
 	double lifeLeftMultiplier = 1.0;
 
 	if(localRenderGroupTypeID == sp_vanillaRenderGroupSmoke)
