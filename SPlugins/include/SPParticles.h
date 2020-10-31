@@ -20,6 +20,7 @@ typedef struct SPParticleRenderGroupInfo {
 	int* vertexDescriptionTypes;
 	char* textureNameA;
 	char* textureNameB;
+	bool renderToEnvironmentMaps;
 } SPParticleRenderGroupInfo;
 
 typedef struct SPParticleEmitterTypeInfo {
