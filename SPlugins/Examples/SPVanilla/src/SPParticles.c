@@ -75,6 +75,24 @@ static int vertexDescriptionTypes[VERTEX_ATTRIBUTE_COUNT] = {
 //define render groups that we wish to use, override or add. To use an existing/predefined render group, either define again or set vertexDescriptionTypeCount to 0
 #define RENDER_GROUP_TYPES_COUNT 6
 static SPParticleRenderGroupInfo renderGroupInfos[RENDER_GROUP_TYPES_COUNT] = {
+	{ 
+		"cloud",
+		sp_vanillaRenderGroupCloud,
+		VERTEX_ATTRIBUTE_COUNT,
+		vertexDescriptionTypes,
+		"img/cloudsN.png",
+		"img/cloudsP.png",
+		true
+	},
+	{ 
+		"cloudBlended",
+		sp_vanillaRenderGroupCloudBlended,
+		VERTEX_ATTRIBUTE_COUNT,
+		vertexDescriptionTypes,
+		"img/cloudsN.png",
+		"img/cloudsP.png",
+		true
+	},
 	{
 		"smokeParticle",
 		sp_vanillaRenderGroupSmoke,
@@ -110,24 +128,6 @@ static SPParticleRenderGroupInfo renderGroupInfos[RENDER_GROUP_TYPES_COUNT] = {
 		"img/particles.png",
 		NULL,
 		false
-	},
-	{ 
-		"cloud",
-		sp_vanillaRenderGroupCloud,
-		VERTEX_ATTRIBUTE_COUNT,
-		vertexDescriptionTypes,
-		"img/cloudsN.png",
-		"img/cloudsP.png",
-		true
-	},
-	{ 
-		"cloudBlended",
-		sp_vanillaRenderGroupCloudBlended,
-		VERTEX_ATTRIBUTE_COUNT,
-		vertexDescriptionTypes,
-		"img/cloudsN.png",
-		"img/cloudsP.png",
-		true
 	}
 };
 
@@ -147,12 +147,16 @@ int spGetRenderGroupTypesCount()
 	return RENDER_GROUP_TYPES_COUNT;
 }
 
+static const double cloudFieldSize = SP_METERS_TO_PRERENDER(280000.0);
+static const double cloudFieldHalfSize = SP_METERS_TO_PRERENDER(140000.0);
+
 static const int cloudGridCount = 48;
-static const double cloudFieldSize = SP_METERS_TO_PRERENDER(240000.0);
-static const double cloudFieldHalfSize = SP_METERS_TO_PRERENDER(120000.0);
 static const double cloudAltitude = SP_METERS_TO_PRERENDER(1800.0);
 
+static const int altoCloudGridCount = 24;
 static const double altoCloudAltitude = SP_METERS_TO_PRERENDER(4800.0);
+
+static const int cirrusCloudGridCount = 6;
 static const double cirrusCloudAltitude = SP_METERS_TO_PRERENDER(8000.0);
 
 
@@ -290,37 +294,51 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 			}
 		}
 
-		SPVec3 cirrusNorth = {0.9, 1.0, 0.0};
+		SPVec3 cirrusNorth = {0.9, -0.5, 0.0};
 		cirrusNorth = spVec3Normalize(cirrusNorth);
 		SPVec3 cirrusRight = spVec3Normalize(spVec3Cross(cirrusNorth, normalizedPos));
 		SPVec3 cirrusNegZ = spVec3Normalize(spVec3Cross(normalizedPos, cirrusRight));
 
 		//cirrus
-		for (int i = 0; i < 16; i++)
+		counter = 0;
+		for(int y = 0; y < cirrusCloudGridCount; y++)
 		{
-			SPVec3 randVec = spRandGetVec3(spRand);
-			state.lifeLeft = (randVec.x * 0.5 + 0.5);
+			for(int x = 0; x < cirrusCloudGridCount; x++)
+			{
 
-			double xPos = -cloudFieldHalfSize + cloudFieldSize * state.lifeLeft;
-			double zPos = -cloudFieldHalfSize + cloudFieldSize * (randVec.y * 0.5 + 0.5);
+				SPVec3 randVec = spRandGetVec3(spRand);
+				if(randVec.z > 0.2 && randVec.z < 0.4)
+				{
 
-			SPVec3 randPosVec = spVec3Add(spVec3Mul(cirrusRight, xPos), spVec3Mul(cirrusNegZ, zPos));
+					double xPosBase = ((((double)x) + 0.5 * randVec.x) / cirrusCloudGridCount);
+					double zPosBase = ((((double)y) + 0.5 * randVec.y) / cirrusCloudGridCount);
 
-			SPVec3 offsetVec = spVec3Add(normalizedPos, randPosVec);
-			SPVec3 randPosNormal = spVec3Normalize(offsetVec);
+					state.lifeLeft = xPosBase;
 
-			state.p = spVec3Mul(randPosNormal, 1.0 + cirrusCloudAltitude - 0.000001 * ((double)i) * 0.01);
-			state.randomValueA = spRandGetValue(spRand);
-			state.scale = 20.0 * (1.0 + randVec.z * 0.2);
+					double xPos = -cloudFieldHalfSize + cloudFieldSize * xPosBase;
+					double zPos = -cloudFieldHalfSize + cloudFieldSize * zPosBase;
 
-			state.v = spVec3Mul(cirrusRight,cloudFieldSize);
+					SPVec3 randPosVec = spVec3Add(spVec3Mul(cirrusRight, xPos), spVec3Mul(cirrusNegZ, zPos));
 
-			state.particleTextureType = 9;
+					SPVec3 offsetVec = spVec3Add(normalizedPos, randPosVec);
+					SPVec3 randPosNormal = spVec3Normalize(offsetVec);
 
-			(*threadState->addParticle)(threadState->particleManager,
-				emitterState,
-				sp_vanillaRenderGroupCloudBlended,
-				&state);
+					state.p = spVec3Mul(randPosNormal, 1.0 + cirrusCloudAltitude - 0.0000001 * ((double)counter) * 0.01);
+					state.randomValueA = spRandGetValue(spRand);
+					state.scale = 40.0 * (1.0 + randVec.z);
+
+					state.v = spVec3Mul(cirrusRight,cloudFieldSize);
+
+					state.particleTextureType = 9;
+
+					(*threadState->addParticle)(threadState->particleManager,
+						emitterState,
+						sp_vanillaRenderGroupCloudBlended,
+						&state);
+
+					counter++;
+				}
+			}
 		}
 
 		//altocumulus
@@ -331,16 +349,16 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 		SPVec3 altocumulusNegZ = spVec3Normalize(spVec3Cross(normalizedPos, altocumulusRight));
 
 		counter = 0;
-		for(int y = 0; y < cloudGridCount; y++)
+		for(int y = 0; y < altoCloudGridCount; y++)
 		{
-			for(int x = 0; x < cloudGridCount; x++)
+			for(int x = 0; x < altoCloudGridCount; x++)
 			{
 
 				SPVec3 randVec = spRandGetVec3(spRand);
 				if(randVec.z > 0.2 && randVec.z < 0.4)
 				{
-					double xPosBase = ((((double)x) + 0.5 * randVec.x) / cloudGridCount);
-					double zPosBase = ((((double)y) + 0.5 * randVec.y) / cloudGridCount);
+					double xPosBase = ((((double)x) + 0.5 * randVec.x) / altoCloudGridCount);
+					double zPosBase = ((((double)y) + 0.5 * randVec.y) / altoCloudGridCount);
 
 					state.lifeLeft = xPosBase;
 
@@ -356,7 +374,7 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 
 					state.p = spVec3Mul(randPosNormal, 1.0 + altoCloudAltitude - 0.0000001 * ((double)counter) * 0.01);
 					state.randomValueA = (altoType == 2 ?  2.5 : spRandGetValue(spRand));
-					state.scale = (randVec.z + 0.4 - 0.3) * 20.0;
+					state.scale = (randVec.z + 0.4 - 0.3) * 40.0;
 
 					state.v = spVec3Mul(altocumulusRight,cloudFieldSize);
 
