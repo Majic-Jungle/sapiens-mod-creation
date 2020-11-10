@@ -278,7 +278,7 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 					SPVec3 offsetVec = spVec3Add(normalizedPos, pos);
 					SPVec3 posNormal = spVec3Normalize(offsetVec);
 
-					SPVec3 lookup = {(posNormal.x + 1.2) * 99.9, (posNormal.y + 0.3) * 99.9, (posNormal.z + 2.4)  * 99.9};
+					SPVec3 lookup = {(posNormal.x + 1.2) * 20.9, (posNormal.y + 0.3) * 20.9, (posNormal.z + 2.4)  * 20.9};
 					double noiseValue = spNoiseGet(threadState->spNoise, lookup, 2);
 
 					if(noiseValue > 0.0)
@@ -336,7 +336,7 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 					SPVec3 offsetVec = spVec3Add(normalizedPos, pos);
 					SPVec3 posNormal = spVec3Normalize(offsetVec);
 
-					SPVec3 lookup = {(posNormal.x + 1.2) * 99.9, (posNormal.y + 0.3) * 99.9, (posNormal.z + 2.4)  * 99.9};
+					SPVec3 lookup = {(posNormal.x + 1.2) * 20.9, (posNormal.y + 0.3) * 20.9, (posNormal.z + 2.4)  * 20.9};
 					double noiseValue = spNoiseGet(threadState->spNoise, lookup, 2);
 
 					if(noiseValue > 0.0)
@@ -440,10 +440,10 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 					SPVec3 offsetVec = spVec3Add(normalizedPos, pos);
 					SPVec3 posNormal = spVec3Normalize(offsetVec);
 
-					SPVec3 lookup = {(posNormal.x + 1.7) * 99.9, (posNormal.y + 0.6) * 99.9, (posNormal.z + 1.2)  * 99.9};
+					SPVec3 lookup = {(posNormal.x + 1.7) * 20.9, (posNormal.y + 0.6) * 20.9, (posNormal.z + 1.2)  * 20.9};
 					double noiseValue = spNoiseGet(threadState->spNoise, lookup, 2);
 
-					if(noiseValue > 0.0)
+					if(noiseValue > 0.3)
 					{
 
 						int altoType = counter % 3;
