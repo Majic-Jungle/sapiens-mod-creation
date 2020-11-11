@@ -147,15 +147,17 @@ int spGetRenderGroupTypesCount()
 	return RENDER_GROUP_TYPES_COUNT;
 }
 
+static const double CLOUD_VELOCITY = 0.0001;
+
 static const double cloudFieldSize = SP_METERS_TO_PRERENDER(600000.0);
 static const double cloudFieldHalfSize = SP_METERS_TO_PRERENDER(300000.0);
 
 static const int cumulusLargeGridCount = 16;
-static const double cumulusLargeAltitude = SP_METERS_TO_PRERENDER(2000.0);
+static const double cumulusLargeAltitude = SP_METERS_TO_PRERENDER(1600.0);
 static const double cumulusLargeScale = 3.0;
 
 static const int cumulusSmallGridCount = 128;
-static const double cumulusSmallAltitude = SP_METERS_TO_PRERENDER(1000.0);
+static const double cumulusSmallAltitude = SP_METERS_TO_PRERENDER(600.0);
 static const double cumulusSmallScale = 0.8;
 
 static const int altoCloudGridCount = 45;
@@ -718,7 +720,7 @@ bool spUpdateParticle(SPParticleThreadState* threadState,
 	if(localRenderGroupTypeID == sp_vanillaRenderGroupCloud || localRenderGroupTypeID == sp_vanillaRenderGroupCloudBlended)
 	{
 
-		particleState->lifeLeft -= dt * 0.0002;
+		particleState->lifeLeft -= dt * CLOUD_VELOCITY;
 		if(particleState->lifeLeft < 0.0)
 		{
 			particleState->lifeLeft += 1.0;
@@ -726,7 +728,7 @@ bool spUpdateParticle(SPParticleThreadState* threadState,
 		}
 		else
 		{
-			particleState->p = spVec3Add(particleState->p, spVec3Mul(particleState->v,  -dt * 0.0002));
+			particleState->p = spVec3Add(particleState->p, spVec3Mul(particleState->v,  -dt * CLOUD_VELOCITY));
 		}
 
 		particleState->p = spVec3Mul(spVec3Normalize(particleState->p), particleState->userData.x);

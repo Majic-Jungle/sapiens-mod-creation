@@ -498,11 +498,7 @@ void getSurfaceTypeInfo(uint16_t* biomeTags, int tagCount, int seasonIndex, Surf
 		}
 		else if(biomeTags[i] == biomeTag_heavySnowWinter)
 		{
-			if(seasonIndex == 0 || seasonIndex == 2)
-			{
-				surfaceTypeInfo->snowDepth = 2;
-			}
-			else if(seasonIndex == 3)
+			if(seasonIndex == 3)
 			{
 				surfaceTypeInfo->snowDepth = 3;
 			}
@@ -748,9 +744,17 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		{
 			if (tags[i] == biomeTag_steppe)
 			{
-				if (!surfaceTypeInfo.hot)
+				if(soilQuality == 0)
 				{
-					grassVariation = terrainVariation_steppeGrass;
+					grassVariation = 0;
+				}
+				else if(soilQuality == 1)
+				{
+					grassVariation = terrainVariation_mediterraneanGrass;
+				}
+				else
+				{
+					grassVariation = terrainVariation_mediterraneanGrassPlentiful;
 				}
 			}
 			else if (tags[i] == biomeTag_rainforest)
