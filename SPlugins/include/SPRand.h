@@ -14,6 +14,7 @@ MJ_EXPORT uint32_t spRandomIntegerValueForUniqueIDAndSeed(uint64_t uniqueID, uin
 MJ_EXPORT SPRand* spRandNew(uint32_t seed);
 MJ_EXPORT void spRandDelete(SPRand* spRand);
 
+MJ_EXPORT SPVec3 spRandomVec3ForUniqueID(SPRand* spRand, uint64_t uniqueID);
 MJ_EXPORT SPVec3 spRandGetVec3(SPRand* spRand);
 MJ_EXPORT double spRandGetValue(SPRand* spRand);
 

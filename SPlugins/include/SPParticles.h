@@ -57,6 +57,8 @@ typedef struct SPParticleThreadState {
 	void (*addParticle)(void*,SPParticleEmitterState*,uint32_t,SPParticleState*);
 	SPRand* spRand;
 	SPNoise* spNoise;
+	SPVec3 playerPos;
+	double worldTime;
 } SPParticleThreadState;
 
 typedef int (* SPGetEmitterTypesCountFunc) ();

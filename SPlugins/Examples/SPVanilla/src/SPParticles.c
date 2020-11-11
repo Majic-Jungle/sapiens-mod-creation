@@ -147,25 +147,26 @@ int spGetRenderGroupTypesCount()
 	return RENDER_GROUP_TYPES_COUNT;
 }
 
-static const double CLOUD_VELOCITY = 0.0001;
+static const double cloudVelocity = 0.0001;
+static const double cloudWorldTimeInfluence = 0.0001;
 
-static const double cloudFieldSize = SP_METERS_TO_PRERENDER(600000.0);
-static const double cloudFieldHalfSize = SP_METERS_TO_PRERENDER(300000.0);
+static const double cloudFieldSize = SP_METERS_TO_PRERENDER(400000.0);
+static const double cloudFieldHalfSize = SP_METERS_TO_PRERENDER(200000.0);
 
 static const int cumulusLargeGridCount = 16;
-static const double cumulusLargeAltitude = SP_METERS_TO_PRERENDER(1600.0);
+static const double cumulusLargeAltitude = SP_METERS_TO_PRERENDER(1800.0);
 static const double cumulusLargeScale = 3.0;
 
-static const int cumulusSmallGridCount = 128;
+static const int cumulusSmallGridCount = 64;
 static const double cumulusSmallAltitude = SP_METERS_TO_PRERENDER(600.0);
 static const double cumulusSmallScale = 0.8;
 
 static const int altoCloudGridCount = 45;
 static const double altoCloudAltitude = SP_METERS_TO_PRERENDER(6800.0);
-static const double altoCloudScale = 80.0;
+static const double altoCloudScale = 40.0;
 
 static const int cirrusCloudGridCount = 6;
-static const double cirrusCloudAltitude = SP_METERS_TO_PRERENDER(12000.0);
+static const double cirrusCloudAltitude = SP_METERS_TO_PRERENDER(8000.0);
 static const double cirrusCloudScale = 60.0;
 
 
@@ -266,7 +267,7 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 			for(int x = 0; x < cumulusLargeGridCount; x++)
 			{
 				//SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(120000.0));
-				SPVec3 randVec = spRandGetVec3(spRand);
+				SPVec3 randVec = spRandomVec3ForUniqueID(spRand, ((uint64_t)(threadState->worldTime * 0.1)) + 34 + y * cumulusLargeGridCount + x);
 				if(randVec.z > 0.2)
 				{
 
@@ -280,7 +281,7 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 					SPVec3 offsetVec = spVec3Add(normalizedPos, pos);
 					SPVec3 posNormal = spVec3Normalize(offsetVec);
 
-					SPVec3 lookup = {(posNormal.x + 1.2) * 20.9, (posNormal.y + 0.3) * 20.9, (posNormal.z + 2.4)  * 20.9};
+					SPVec3 lookup = {(posNormal.x + 1.2) * 200.9, (posNormal.y + 0.3) * 200.9, (posNormal.z + 2.4)  * 200.9 + threadState->worldTime * cloudWorldTimeInfluence};
 					double noiseValue = spNoiseGet(threadState->spNoise, lookup, 2);
 
 					if(noiseValue > 0.0)
@@ -324,7 +325,7 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 			for(int x = 0; x < cumulusSmallGridCount; x++)
 			{
 				//SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(120000.0));
-				SPVec3 randVec = spRandGetVec3(spRand);
+				SPVec3 randVec = spRandomVec3ForUniqueID(spRand, ((uint64_t)(threadState->worldTime * 0.1)) + 1487 + y * cumulusSmallGridCount + x);
 				//if(randVec.z > 0.2)
 				{
 
@@ -338,7 +339,7 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 					SPVec3 offsetVec = spVec3Add(normalizedPos, pos);
 					SPVec3 posNormal = spVec3Normalize(offsetVec);
 
-					SPVec3 lookup = {(posNormal.x + 1.2) * 20.9, (posNormal.y + 0.3) * 20.9, (posNormal.z + 2.4)  * 20.9};
+					SPVec3 lookup = {(posNormal.x + 1.2) * 200.9, (posNormal.y + 0.3) * 200.9, (posNormal.z + 2.4)  * 200.9 + threadState->worldTime * cloudWorldTimeInfluence};
 					double noiseValue = spNoiseGet(threadState->spNoise, lookup, 2);
 
 					if(noiseValue > 0.0)
@@ -376,7 +377,7 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 			for(int x = 0; x < cirrusCloudGridCount; x++)
 			{
 
-				SPVec3 randVec = spRandGetVec3(spRand);
+				SPVec3 randVec = spRandomVec3ForUniqueID(spRand, ((uint64_t)(threadState->worldTime * 0.1)) + 79157 + y * cirrusCloudGridCount + x);
 				if(randVec.z > 0.2 && randVec.z < 0.4)
 				{
 
@@ -393,7 +394,7 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 					SPVec3 offsetVec = spVec3Add(normalizedPos, pos);
 					SPVec3 posNormal = spVec3Normalize(offsetVec);
 
-					double altitude = 1.0 + cirrusCloudAltitude - 0.0000001 * ((double)counter) * 0.01;
+					double altitude = 1.0 + cirrusCloudAltitude - 0.0000000001 * ((double)counter);
 					state.p = spVec3Mul(posNormal, altitude);
 					state.randomValueA = spRandGetValue(spRand);
 					state.scale = cirrusCloudScale * (1.0 + randVec.z);
@@ -425,8 +426,8 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 		{
 			for(int x = 0; x < altoCloudGridCount; x++)
 			{
-
-				SPVec3 randVec = spRandGetVec3(spRand);
+				//SPVec3 randVec = spRandomVec3ForUniqueID(spRand, ((uint64_t)(threadState->worldTime * 0.1)) + 91711  + y * altoCloudGridCount + x);
+				SPVec3 randVec = spRandomVec3ForUniqueID(spRand, ((uint64_t)(threadState->worldTime * 0.1)) + 79157 + y * altoCloudGridCount + x);
 				if(randVec.z > 0.2 && randVec.z < 0.4)
 				{
 					double xPosBase = ((((double)x) + 0.5 * randVec.x) / altoCloudGridCount);
@@ -442,8 +443,8 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 					SPVec3 offsetVec = spVec3Add(normalizedPos, pos);
 					SPVec3 posNormal = spVec3Normalize(offsetVec);
 
-					SPVec3 lookup = {(posNormal.x + 1.7) * 20.9, (posNormal.y + 0.6) * 20.9, (posNormal.z + 1.2)  * 20.9};
-					double noiseValue = spNoiseGet(threadState->spNoise, lookup, 2);
+					SPVec3 lookup = {(posNormal.x + 1.7) * 200.9, (posNormal.y + 0.6) * 200.9, (posNormal.z + 1.2)  * 200.9 + threadState->worldTime * cloudWorldTimeInfluence};
+					double noiseValue = spNoiseGet(threadState->spNoise, lookup, 1);
 
 					if(noiseValue > 0.3)
 					{
@@ -720,7 +721,7 @@ bool spUpdateParticle(SPParticleThreadState* threadState,
 	if(localRenderGroupTypeID == sp_vanillaRenderGroupCloud || localRenderGroupTypeID == sp_vanillaRenderGroupCloudBlended)
 	{
 
-		particleState->lifeLeft -= dt * CLOUD_VELOCITY;
+		particleState->lifeLeft -= dt * cloudVelocity;
 		if(particleState->lifeLeft < 0.0)
 		{
 			particleState->lifeLeft += 1.0;
@@ -728,7 +729,7 @@ bool spUpdateParticle(SPParticleThreadState* threadState,
 		}
 		else
 		{
-			particleState->p = spVec3Add(particleState->p, spVec3Mul(particleState->v,  -dt * CLOUD_VELOCITY));
+			particleState->p = spVec3Add(particleState->p, spVec3Mul(particleState->v,  -dt * cloudVelocity));
 		}
 
 		particleState->p = spVec3Mul(spVec3Normalize(particleState->p), particleState->userData.x);

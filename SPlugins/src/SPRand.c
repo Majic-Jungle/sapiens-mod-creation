@@ -128,6 +128,16 @@ void spRandDelete(SPRand* spRand)
 }
 
 
+SPVec3 spRandomVec3ForUniqueID(SPRand* spRand, uint64_t uniqueID)
+{
+	SPVec3 result = {
+		(spRandomValueForUniqueIDAndSeed(uniqueID, spRand->seed) - 0.5) * 2.0,
+		(spRandomValueForUniqueIDAndSeed(uniqueID + 8932114, spRand->seed) - 0.5) * 2.0,
+		(spRandomValueForUniqueIDAndSeed(uniqueID + 90191230, spRand->seed) - 0.5) * 2.0
+	};
+	return result;
+}
+
 SPVec3 spRandGetVec3(SPRand* spRand)
 {
 	SPVec3 result = {
