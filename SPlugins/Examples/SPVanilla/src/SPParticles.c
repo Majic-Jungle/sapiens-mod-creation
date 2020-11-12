@@ -158,8 +158,8 @@ static const double cumulusLargeAltitude = SP_METERS_TO_PRERENDER(1800.0);
 static const double cumulusLargeScale = 3.0;
 
 static const int cumulusSmallGridCount = 64;
-static const double cumulusSmallAltitude = SP_METERS_TO_PRERENDER(600.0);
-static const double cumulusSmallScale = 0.8;
+static const double cumulusSmallAltitude = SP_METERS_TO_PRERENDER(800.0);
+static const double cumulusSmallScale = 0.7;
 
 static const int altoCloudGridCount = 45;
 static const double altoCloudAltitude = SP_METERS_TO_PRERENDER(6800.0);
@@ -313,58 +313,6 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 			}
 		}
 
-		SPVec3 cumulusSmallNorth = {-0.3, 1.0, 0.0};
-		cumulusSmallNorth = spVec3Normalize(cumulusSmallNorth);
-		SPVec3 cumulusSmallRight = spVec3Normalize(spVec3Cross(cumulusSmallNorth, normalizedPos));
-		SPVec3 cumulusSmallNegZ = spVec3Normalize(spVec3Cross(normalizedPos, cumulusSmallRight));
-
-
-		//counter = 0;
-		for(int y = 0; y < cumulusSmallGridCount; y++)
-		{
-			for(int x = 0; x < cumulusSmallGridCount; x++)
-			{
-				//SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(120000.0));
-				SPVec3 randVec = spRandomVec3ForUniqueID(spRand, ((uint64_t)(threadState->worldTime * 0.1)) + 1487 + y * cumulusSmallGridCount + x);
-				//if(randVec.z > 0.2)
-				{
-
-					state.lifeLeft = ((((double)x) + 0.5 * randVec.x) / cumulusSmallGridCount);
-
-					double xPos = -cloudFieldHalfSize + cloudFieldSize * state.lifeLeft;
-					double zPos = -cloudFieldHalfSize + cloudFieldSize * ((((double)y) + 0.5 * randVec.y) / cumulusSmallGridCount);
-
-					SPVec3 pos = spVec3Add(spVec3Mul(cumulusSmallRight, xPos), spVec3Mul(cumulusSmallNegZ, zPos));
-
-					SPVec3 offsetVec = spVec3Add(normalizedPos, pos);
-					SPVec3 posNormal = spVec3Normalize(offsetVec);
-
-					SPVec3 lookup = {(posNormal.x + 1.2) * 200.9, (posNormal.y + 0.3) * 200.9, (posNormal.z + 2.4)  * 200.9 + threadState->worldTime * cloudWorldTimeInfluence};
-					double noiseValue = spNoiseGet(threadState->spNoise, lookup, 2);
-
-					if(noiseValue > 0.0)
-					{
-
-						double altitude = 1.0 + cumulusSmallAltitude;
-						state.p = spVec3Mul(posNormal, 1.0 + cumulusSmallAltitude);
-						state.particleTextureType = (counter % 16) + 12;
-						state.randomValueA = spRandGetValue(spRand);
-						state.scale = (randVec.z + 1.2) * cumulusSmallScale * (noiseValue + 1.0);
-
-						state.v = spVec3Mul(cumulusSmallRight,cloudFieldSize);
-						state.userData.x = altitude;
-
-						(*threadState->addParticle)(threadState->particleManager,
-							emitterState,
-							sp_vanillaRenderGroupCloud,
-							&state);
-
-						counter++;
-					}
-				}
-			}
-		}
-
 		SPVec3 cirrusNorth = {0.9, -0.5, 0.0};
 		cirrusNorth = spVec3Normalize(cirrusNorth);
 		SPVec3 cirrusRight = spVec3Normalize(spVec3Cross(cirrusNorth, normalizedPos));
@@ -428,7 +376,7 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 			{
 				//SPVec3 randVec = spRandomVec3ForUniqueID(spRand, ((uint64_t)(threadState->worldTime * 0.1)) + 91711  + y * altoCloudGridCount + x);
 				SPVec3 randVec = spRandomVec3ForUniqueID(spRand, ((uint64_t)(threadState->worldTime * 0.1)) + 79157 + y * altoCloudGridCount + x);
-				if(randVec.z > 0.2 && randVec.z < 0.4)
+				if(randVec.z > 0.0 && randVec.z < 0.4)
 				{
 					double xPosBase = ((((double)x) + 0.5 * randVec.x) / altoCloudGridCount);
 					double zPosBase = ((((double)y) + 0.5 * randVec.y) / altoCloudGridCount);
@@ -465,6 +413,67 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 							emitterState,
 							sp_vanillaRenderGroupCloudBlended,
 							&state);
+
+						counter++;
+					}
+				}
+			}
+		}
+
+		SPVec3 cumulusSmallNorth = {-0.3, 1.0, 0.0};
+		cumulusSmallNorth = spVec3Normalize(cumulusSmallNorth);
+		SPVec3 cumulusSmallRight = spVec3Normalize(spVec3Cross(cumulusSmallNorth, normalizedPos));
+		SPVec3 cumulusSmallNegZ = spVec3Normalize(spVec3Cross(normalizedPos, cumulusSmallRight));
+
+
+		//counter = 0;
+		for(int y = 0; y < cumulusSmallGridCount; y++)
+		{
+			for(int x = 0; x < cumulusSmallGridCount; x++)
+			{
+				//SPVec3 randPosVec = spVec3Mul(spRandGetVec3(spRand), SP_METERS_TO_PRERENDER(120000.0));
+				SPVec3 randVec = spRandomVec3ForUniqueID(spRand, ((uint64_t)(threadState->worldTime * 0.1)) + 1487 + y * cumulusSmallGridCount + x);
+				//if(randVec.z > 0.2)
+				{
+
+					state.lifeLeft = ((((double)x) + 0.5 * randVec.x) / cumulusSmallGridCount);
+
+					double xPos = -cloudFieldHalfSize + cloudFieldSize * state.lifeLeft;
+					double zPos = -cloudFieldHalfSize + cloudFieldSize * ((((double)y) + 0.5 * randVec.y) / cumulusSmallGridCount);
+
+					SPVec3 pos = spVec3Add(spVec3Mul(cumulusSmallRight, xPos), spVec3Mul(cumulusSmallNegZ, zPos));
+
+					SPVec3 offsetVec = spVec3Add(normalizedPos, pos);
+					SPVec3 posNormal = spVec3Normalize(offsetVec);
+
+					SPVec3 lookup = {(posNormal.x + 1.2) * 200.9, (posNormal.y + 0.3) * 200.9, (posNormal.z + 2.4)  * 200.9 + threadState->worldTime * cloudWorldTimeInfluence};
+					double noiseValue = spNoiseGet(threadState->spNoise, lookup, 2);
+
+					if(noiseValue > 0.0)
+					{
+
+						double altitude = 1.0 + cumulusSmallAltitude;
+						state.p = spVec3Mul(posNormal, 1.0 + cumulusSmallAltitude);
+						state.particleTextureType = (counter % 16) + 12;
+						state.randomValueA = spRandGetValue(spRand);
+						state.scale = (randVec.z + 1.2) * cumulusSmallScale * (noiseValue + 1.0);
+
+						state.v = spVec3Mul(cumulusSmallRight,cloudFieldSize);
+						state.userData.x = altitude;
+
+						(*threadState->addParticle)(threadState->particleManager,
+							emitterState,
+							sp_vanillaRenderGroupCloud,
+							&state);
+
+						state.particleTextureType = (counter % 16) + 12 + 16;
+
+						(*threadState->addParticle)(threadState->particleManager,
+							emitterState,
+							sp_vanillaRenderGroupCloudBlended,
+							&state);
+
+						counter++;
 
 						counter++;
 					}
