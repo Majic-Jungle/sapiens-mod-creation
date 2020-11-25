@@ -48,6 +48,12 @@ SPVec2 spVec2Mul(SPVec2 a, double b)
 	return result;
 }
 
+SPVec2 spVec2MulVec2(SPVec2 a, SPVec2 b)
+{
+	SPVec2 result = { a.x * b.x, a.y * b.y };
+	return result;
+}
+
 SPVec2 spVec2Div(SPVec2 a, double b)
 {
 	SPVec2 result = { a.x / b, a.y / b };
@@ -75,6 +81,12 @@ SPVec3 spVec3Sub(SPVec3 a, SPVec3 b)
 SPVec3 spVec3Mul(SPVec3 a, double b)
 {
 	SPVec3 result = { a.x * b, a.y * b, a.z * b };
+	return result;
+}
+
+SPVec3 spVec3MulVec3(SPVec3 a, SPVec3 b)
+{
+	SPVec3 result = { a.x * b.x, a.y * b.y, a.z * b.z };
 	return result;
 }
 
@@ -158,6 +170,12 @@ SPVec4 spVec4Sub(SPVec4 a, SPVec4 b)
 SPVec4 spVec4Mul(SPVec4 a, double b)
 {
 	SPVec4 result = { a.x * b, a.y * b, a.z * b, a.w * b };
+	return result;
+}
+
+SPVec4 spVec4MulVec4(SPVec4 a, SPVec4 b)
+{
+	SPVec4 result = { a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w };
 	return result;
 }
 
@@ -590,4 +608,91 @@ bool spPointIsLeftOfLine(SPVec3 p1, SPVec3 a, SPVec3 b)
 {
 	SPVec3 faceNormal = spVec3Cross(a, b);
 	return (spVec3Dot(faceNormal, p1) >= 0);
+}
+
+void spMat4InversePtr(SPMat4* mat, SPMat4* result)
+{
+	double* m = (double*)mat;
+
+	double coef00 = m[10] * m[15] - m[14] * m[11];
+	double coef02 = m[6] * m[15] - m[14] * m[7];
+	double coef03 = m[6] * m[11] - m[10] * m[7];
+
+	double coef04 = m[9] * m[15] - m[13] * m[11];
+	double coef06 = m[5] * m[15] - m[13] * m[7];
+	double coef07 = m[5] * m[11] - m[9] * m[7];
+
+	double coef08 = m[9] * m[14] - m[13] * m[10];
+	double coef10 = m[5] * m[14] - m[13] * m[6];
+	double coef11 = m[5] * m[10] - m[9] * m[6];
+
+	double coef12 = m[8] * m[15] - m[12] * m[11];
+	double coef14 = m[4] * m[15] - m[12] * m[7];
+	double coef15 = m[4] * m[11] - m[8] * m[7];
+
+	double coef16 = m[8] * m[14] - m[12] * m[10];
+	double coef18 = m[4] * m[14] - m[12] * m[6];
+	double coef19 = m[4] * m[10] - m[8] * m[6];
+
+	double coef20 = m[8] * m[13] - m[12] * m[9];
+	double coef22 = m[4] * m[13] - m[12] * m[5];
+	double coef23 = m[4] * m[9] - m[8] * m[5];
+
+	SPVec4 fac0 = {coef00, coef00, coef02, coef03};
+	SPVec4 fac1 = {coef04, coef04, coef06, coef07};
+	SPVec4 fac2 = {coef08, coef08, coef10, coef11};
+	SPVec4 fac3 = {coef12, coef12, coef14, coef15};
+	SPVec4 fac4 = {coef16, coef16, coef18, coef19};
+	SPVec4 fac5 = {coef20, coef20, coef22, coef23};
+
+	SPVec4 mvec0 = {m[4], m[0], m[0], m[0]};
+	SPVec4 mvec1 = {m[5], m[1], m[1], m[1]};
+	SPVec4 mvec2 = {m[6], m[2], m[2], m[2]};
+	SPVec4 mvec3 = {m[7], m[3], m[3], m[3]};
+
+	SPVec4 inv0 = spVec4Add(spVec4Sub(spVec4MulVec4(mvec1, fac0), spVec4MulVec4(mvec2, fac1)), spVec4MulVec4(mvec3, fac2));
+	SPVec4 inv1 = spVec4Add(spVec4Sub(spVec4MulVec4(mvec0, fac0), spVec4MulVec4(mvec2, fac3)), spVec4MulVec4(mvec3, fac4));
+	SPVec4 inv2 = spVec4Add(spVec4Sub(spVec4MulVec4(mvec0, fac1), spVec4MulVec4(mvec1, fac3)), spVec4MulVec4(mvec3, fac5));
+	SPVec4 inv3 = spVec4Add(spVec4Sub(spVec4MulVec4(mvec0, fac2), spVec4MulVec4(mvec1, fac4)), spVec4MulVec4(mvec2, fac5));
+
+	SPVec4 signA = {+1, -1, +1, -1};
+	SPVec4 signB = {-1, +1, -1, +1};
+
+	SPVec4 invMat0 = spVec4MulVec4(inv0, signA);
+	SPVec4 invMat1 = spVec4MulVec4(inv1, signB);
+	SPVec4 invMat2 = spVec4MulVec4(inv2, signA);
+	SPVec4 invMat3 = spVec4MulVec4(inv3, signB);
+
+	SPVec4 baseRow0 = {m[0],m[1],m[2],m[3]};
+	SPVec4 invRow0 = {invMat0.x, invMat1.x, invMat2.x, invMat3.x};
+
+	SPVec4 dot0 = spVec4MulVec4(baseRow0, invRow0);
+
+	double dot1 = (dot0.x + dot0.y) + (dot0.z + dot0.w);
+
+	double oneOverDeterminant = 1.0 / dot1;
+
+	double* inverse = (double*)result;
+
+	inverse[0] =  invMat0.x * oneOverDeterminant;
+	inverse[1] =  invMat0.y * oneOverDeterminant;
+	inverse[2] =  invMat0.z * oneOverDeterminant;
+	inverse[3] =  invMat0.w * oneOverDeterminant;
+
+	inverse[4] =  invMat1.x * oneOverDeterminant;
+	inverse[5] =  invMat1.y * oneOverDeterminant;
+	inverse[6] =  invMat1.z * oneOverDeterminant;
+	inverse[7] =  invMat1.w * oneOverDeterminant;
+
+	inverse[8] =  invMat2.x * oneOverDeterminant;
+	inverse[9] =  invMat2.y * oneOverDeterminant;
+	inverse[10] = invMat2.z * oneOverDeterminant;
+	inverse[11] = invMat2.w * oneOverDeterminant;
+
+	inverse[12] = invMat3.x * oneOverDeterminant;
+	inverse[13] = invMat3.y * oneOverDeterminant;
+	inverse[14] = invMat3.z * oneOverDeterminant;
+	inverse[15] = invMat3.w * oneOverDeterminant;
+
+
 }

@@ -91,17 +91,20 @@ MJ_EXPORT double spSmoothStep(double edge0, double edge1, double x);
 MJ_EXPORT SPVec2 spVec2Add(SPVec2 a, SPVec2 b);
 MJ_EXPORT SPVec2 spVec2Sub(SPVec2 a, SPVec2 b);
 MJ_EXPORT SPVec2 spVec2Mul(SPVec2 a, double b);
+MJ_EXPORT SPVec2 spVec2MulVec2(SPVec2 a, SPVec2 b);
 MJ_EXPORT SPVec2 spVec2Div(SPVec2 a, double b);
 MJ_EXPORT SPVec2 spVec2Neg(SPVec2 a);
 
 MJ_EXPORT SPVec3 spVec3Add(SPVec3 a, SPVec3 b);
 MJ_EXPORT SPVec3 spVec3Sub(SPVec3 a, SPVec3 b);
 MJ_EXPORT SPVec3 spVec3Mul(SPVec3 a, double b);
+MJ_EXPORT SPVec3 spVec3MulVec3(SPVec3 a, SPVec3 b);
 MJ_EXPORT SPVec3 spVec3Div(SPVec3 a, double b);
 MJ_EXPORT SPVec3 spVec3Neg(SPVec3 a);
 
 MJ_EXPORT SPVec4 spVec4Add(SPVec4 a, SPVec4 b);
 MJ_EXPORT SPVec4 spVec4Sub(SPVec4 a, SPVec4 b);
+MJ_EXPORT SPVec4 spVec4MulVec4(SPVec4 a, SPVec4 b);
 MJ_EXPORT SPVec4 spVec4Mul(SPVec4 a, double b);
 MJ_EXPORT SPVec4 spVec4Div(SPVec4 a, double b);
 MJ_EXPORT SPVec4 spVec4Neg(SPVec4 a);
@@ -137,5 +140,8 @@ MJ_EXPORT void spMat3InversePtr(SPMat3* m, SPMat3* result);
 MJ_EXPORT void spMat3SlerpPtr(SPMat3* a, SPMat3* b, double fraction, SPMat3* result);
 
 MJ_EXPORT bool spPointIsLeftOfLine(SPVec3 p1, SPVec3 a, SPVec3 b);
+
+MJ_EXPORT void spMat4InversePtr(SPMat4* m, SPMat4* result);
+
 
 #endif
