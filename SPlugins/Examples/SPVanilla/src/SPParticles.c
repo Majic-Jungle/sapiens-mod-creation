@@ -159,19 +159,19 @@ static const double cloudWorldTimeInfluence = 0.0001;
 static const double cloudFieldSize = SP_METERS_TO_PRERENDER(400000.0);
 static const double cloudFieldHalfSize = SP_METERS_TO_PRERENDER(200000.0);
 
-static const int cumulusLargeGridCount = 16;
+static const int cumulusLargeGridCount = 8;
 static const double cumulusLargeAltitude = SP_METERS_TO_PRERENDER(1800.0);
 static const double cumulusLargeScale = 3.0;
 
-static const int cumulusSmallGridCount = 64;
+static const int cumulusSmallGridCount = 32;
 static const double cumulusSmallAltitude = SP_METERS_TO_PRERENDER(800.0);
 static const double cumulusSmallScale = 0.7;
 
-static const int altoCloudGridCount = 45;
+static const int altoCloudGridCount = 32;
 static const double altoCloudAltitude = SP_METERS_TO_PRERENDER(6800.0);
 static const double altoCloudScale = 40.0;
 
-static const int cirrusCloudGridCount = 6;
+static const int cirrusCloudGridCount = 4;
 static const double cirrusCloudAltitude = SP_METERS_TO_PRERENDER(8000.0);
 static const double cirrusCloudScale = 60.0;
 
