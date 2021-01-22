@@ -21,6 +21,7 @@ typedef struct SPParticleRenderGroupInfo {
 	char* textureNameA;
 	char* textureNameB;
 	bool renderToEnvironmentMaps;
+	bool renderBeforeOtherTransparentObjects;
 } SPParticleRenderGroupInfo;
 
 typedef struct SPParticleEmitterTypeInfo {

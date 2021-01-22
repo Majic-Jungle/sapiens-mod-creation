@@ -82,7 +82,8 @@ static SPParticleRenderGroupInfo renderGroupInfos[RENDER_GROUP_TYPES_COUNT] = {
 		vertexDescriptionTypes,
 		"img/cloudsN.png",
 		"img/cloudsP.png",
-		true
+		true,
+		true,
 	},
 	{ 
 		"cloudBlended",
@@ -91,7 +92,8 @@ static SPParticleRenderGroupInfo renderGroupInfos[RENDER_GROUP_TYPES_COUNT] = {
 		vertexDescriptionTypes,
 		"img/cloudsN.png",
 		"img/cloudsP.png",
-		true
+		true,
+		true,
 	},
 	{
 		"smokeParticle",
@@ -100,7 +102,8 @@ static SPParticleRenderGroupInfo renderGroupInfos[RENDER_GROUP_TYPES_COUNT] = {
 		vertexDescriptionTypes,
 		"img/particles.png",
 		NULL,
-		false
+		false,
+		false,
 	},
 	{
 		"fireParticle",
@@ -109,7 +112,8 @@ static SPParticleRenderGroupInfo renderGroupInfos[RENDER_GROUP_TYPES_COUNT] = {
 		vertexDescriptionTypes,
 		"img/particles.png",
 		NULL,
-		false
+		false,
+		false,
 	},
 	{
 		"particle",
@@ -118,7 +122,8 @@ static SPParticleRenderGroupInfo renderGroupInfos[RENDER_GROUP_TYPES_COUNT] = {
 		vertexDescriptionTypes,
 		"img/particles.png",
 		NULL,
-		false
+		false,
+		false,
 	},
 	{ 
 		"spark",
@@ -127,7 +132,8 @@ static SPParticleRenderGroupInfo renderGroupInfos[RENDER_GROUP_TYPES_COUNT] = {
 		vertexDescriptionTypes,
 		"img/particles.png",
 		NULL,
-		false
+		false,
+		false,
 	}
 };
 
