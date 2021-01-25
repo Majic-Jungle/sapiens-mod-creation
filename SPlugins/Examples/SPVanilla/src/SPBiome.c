@@ -568,14 +568,14 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	SurfaceTypeInfo surfaceTypeInfo;
 	SPSurfaceTypeResult result = incomingType;
 	memset(&surfaceTypeInfo, 0, sizeof(surfaceTypeInfo));
-	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 24999.0);
+	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 45999.0);
 	double noiseValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
 
 	getSurfaceTypeInfo(tags, tagCount, seasonIndex, &surfaceTypeInfo, steepness, noiseValue);
 
 
 
-	SPVec3 scaledNoiseMedScale = spVec3Mul(noiseLoc, 42273.0);
+	SPVec3 scaledNoiseMedScale = spVec3Mul(noiseLoc, 92273.0);
 	double noiseValueMed = spNoiseGet(threadState->spNoise1, scaledNoiseMedScale, 2);
 
 	double soilRichnessNoiseValue = getSoilRichnessNoiseValue(threadState, noiseLoc, steepness, riverDistance);
@@ -623,7 +623,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	bool isRock = (steepness > rockSteepness + noiseValue * 0.5);
 	bool isClay = hasClay && !isRock && (steepness > claySteepness + noiseValue * 0.5 - (1.0 - riverDistance) * (1.0 - riverDistance) * 0.5);
 
-	bool isLimestone = (noiseValueMed > 0.2 && noiseValue < 0.1);
+	bool isLimestone = (noiseValueMed > 0.2 && noiseValue < 0.2);
 
 	if(digFillOffset != 0 && !isRock)
 	{
@@ -844,7 +844,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	if(isLimestone)
 	{
 		variations[result.variationCount++] = terrainVariation_limestone;
-		if(noiseValueMed > 0.3 && soilRichnessNoiseValue < 0.1 && noiseValue < -0.1)
+		if(noiseValueMed > 0.3 && soilRichnessNoiseValue < 0.1 && noiseValue < 0.0)
 		{
 			variations[result.variationCount++] = terrainVariation_flint;
 		}
@@ -1382,6 +1382,7 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 								if(variations[i] == terrainVariation_flint)
 								{
 									rockType = gameObjectType_flint;
+									break;
 								}
 								else if(variations[i] == terrainVariation_limestone)
 								{
