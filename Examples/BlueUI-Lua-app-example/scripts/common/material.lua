@@ -5,8 +5,7 @@ local mod = {
     loadOrder = 1, -- lower numbers are loaded first, and should be preffered. If you require the mod be loaded after other mods, use a higher number.
 }
 
-function mod:onload(incoming)
-    local material = incoming
+function mod:onload(material)
 
     material.types["ui_background"].color = vec3(0.05,0.1,0.2)
     material.types["ui_background"].metal = 1.0
