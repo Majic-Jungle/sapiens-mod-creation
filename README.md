@@ -1,6 +1,8 @@
 # Sapiens Mod Creation Tools
 This is the official tools and examples for mod creation in the upcoming game [Sapiens](https://playsapiens.com)
 
+The [Documentation Wiki](https://github.com/mjdave/sapiens-mod-creation/wiki) is a WIP, slowly being worked on and added to, but is worth a look through also.
+
 The tools and this readme are an extremely early work in progress, the game isn't out yet, and there is no way to test any created mods without the game. So for now, you can have a look around, maybe try to compile a C mod, and let me (Dave) know on the [Sapiens Discord](https://discord.gg/VAkYw2r) if you have any problems.
 
 # Overview
@@ -38,3 +40,7 @@ Every mod needs a modInfo.lua file. This is hopefully pretty self explanatory, y
 More information on this will be added later, but the plan is to release the server for both Windows and Linux (testing on Ubuntu only). At the moment, there will only be a Windows game client, though this could change later.
 
 Example VS2017 solutions are provided to compile mods for Windows, and the same dll can be used for both the client and the standalone Windows server. For Linux it is using cmake to create a .so library, which only needs to be used by standalone servers.
+
+# More Information
+
+Please have a look at the [Sapiens Documentation Wiki](https://github.com/mjdave/sapiens-mod-creation/wiki), join the [Sapiens forums](https://forums.playsapiens.com/), or come and chat on the [Sapiens Discord](https://discord.gg/VAkYw2r).
