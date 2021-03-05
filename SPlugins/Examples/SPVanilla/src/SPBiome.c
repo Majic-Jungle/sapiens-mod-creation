@@ -1091,7 +1091,7 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 						{
 							if(forestInfo.birch)
 							{
-								if(spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3254, 10 + 1000 / treeCount) == 1)
+								if(spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 3254, 100 / treeCount) == 1)
 								{
 									ADD_OBJECT(gameObjectType_aspen3);
 								}
