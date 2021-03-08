@@ -37,7 +37,7 @@ static uint16_t biomeTag_river;
 static uint32_t terrainBaseType_rock;
 static uint32_t terrainBaseType_limestone;
 static uint32_t terrainBaseType_beachSand;
-static uint32_t terrainBaseType_gravel;
+static uint32_t terrainBaseType_riverSand;
 static uint32_t terrainBaseType_desertSand;
 static uint32_t terrainBaseType_ice;
 static uint32_t terrainBaseType_desertRedSand;
@@ -136,7 +136,7 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 	terrainBaseType_rock							= threadState->getTerrainBaseTypeIndex(threadState, "rock");
 	terrainBaseType_limestone						= threadState->getTerrainBaseTypeIndex(threadState, "limestone");
 	terrainBaseType_beachSand						= threadState->getTerrainBaseTypeIndex(threadState, "beachSand");
-	terrainBaseType_gravel							= threadState->getTerrainBaseTypeIndex(threadState, "gravel");
+	terrainBaseType_riverSand					    = threadState->getTerrainBaseTypeIndex(threadState, "riverSand");
 	terrainBaseType_desertSand						= threadState->getTerrainBaseTypeIndex(threadState, "desertSand");
 	terrainBaseType_ice								= threadState->getTerrainBaseTypeIndex(threadState, "ice");
 	terrainBaseType_desertRedSand					= threadState->getTerrainBaseTypeIndex(threadState, "desertRedSand");
@@ -209,7 +209,7 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 
 float getSoilRichnessNoiseValue(SPBiomeThreadState* threadState, SPVec3 noiseLoc, float steepness, float riverDistance)
 {
-	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 12000.0);
+	SPVec3 scaledNoiseLoc = spVec3Mul(noiseLoc, 20000.0);
 	return spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 4) - steepness * 0.5 + (1.0 - pow(riverDistance, 0.3)) * 0.6;
 }
 
@@ -538,7 +538,7 @@ uint32_t getBeachSurfaceType(SurfaceTypeInfo* surfaceTypeInfo, float riverDistan
 	{
 		if(riverDistance < (noiseValue * 0.01 + 0.005) - (0.04 * digFillOffset))
 		{
-			return terrainBaseType_gravel;
+			return terrainBaseType_riverSand;
 		}
 		else
 		{
@@ -546,7 +546,7 @@ uint32_t getBeachSurfaceType(SurfaceTypeInfo* surfaceTypeInfo, float riverDistan
 		}
 	}
 
-	return (noiseValue > 0.1 + (0.4 * digFillOffset) ? terrainBaseType_gravel : terrainBaseType_beachSand);
+	return (noiseValue > 0.1 + (0.4 * digFillOffset) ? terrainBaseType_riverSand : terrainBaseType_beachSand);
 }
 
 SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadState,
@@ -622,6 +622,8 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 	bool isBeach = ((altitude + noiseValue * 0.00000005 + noiseValueLarge * 0.0000005) < 0.0000001);
 	bool isRock = (steepness > rockSteepness + noiseValue * 0.5);
 	bool isClay = hasClay && !isRock && (steepness > claySteepness + noiseValue * 0.5 - (1.0 - riverDistance) * (1.0 - riverDistance) * 0.5);
+	bool isDesertSand = (soilRichnessNoiseValue < -0.65);
+	bool hasSand = (!hasClay && soilRichnessNoiseValue < -0.45);
 
 	bool isLimestone = (noiseValueMed > 0.2 && noiseValue < 0.2);
 
@@ -636,6 +638,13 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 			if(digFillOffset < (noiseValueMed * 4) - 1)
 			{
 				isClay = true;
+			}
+		}
+		else if(hasSand && !isDesertSand)
+		{
+			if(digFillOffset < (noiseValueMed * 4) - 1)
+			{
+				isDesertSand = true;
 			}
 		}
 	}
@@ -676,9 +685,14 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 		{
 			result.surfaceBaseType = getBeachSurfaceType(&surfaceTypeInfo, riverDistance, noiseValue, digFillOffset);
 		}
+		else if(isDesertSand)
+		{
+			result.surfaceBaseType = terrainBaseType_desertSand;
+			soilQuality = 0;
+		}
 		else
 		{
-			if(soilRichnessNoiseValue < -0.4)
+			if(soilRichnessNoiseValue < -0.3)
 			{
 				result.surfaceBaseType = terrainBaseType_poorDirt;
 				soilQuality = 0;
@@ -738,7 +752,7 @@ SPSurfaceTypeResult spBiomeGetSurfaceTypeForPoint(SPBiomeThreadState* threadStat
 
 	uint32_t grassVariation = 0;
 
-	if (!vegetationRemoved && (!isRock && !isBeach && !isClay))
+	if (!vegetationRemoved && (!isRock && !isBeach && !isClay && !isDesertSand))
 	{
 		for (int i = 0; i < tagCount; i++)
 		{
@@ -1181,7 +1195,7 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 400.0);
 					double rawValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
 					double rangedFractionValue = rawValue * rawValue * 8.0;
-					if(terrainBaseType == terrainBaseType_gravel)
+					if(terrainBaseType == terrainBaseType_riverSand)
 					{
 						rangedFractionValue += 1.0;
 					}
@@ -1314,7 +1328,7 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 400.0);
 					double rawValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
 					double rangedFractionValue = rawValue * rawValue * 8.0;
-					if(terrainBaseType == terrainBaseType_gravel)
+					if(terrainBaseType == terrainBaseType_riverSand)
 					{
 						rangedFractionValue += 1.0;
 					}
@@ -1362,7 +1376,7 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 					SPVec3 scaledNoiseLoc = spVec3Mul(noiseLookup, 4000.0);
 					double rawValue = spNoiseGet(threadState->spNoise1, scaledNoiseLoc, 2);
 					double rangedFractionValue = rawValue * rawValue * 8.0;
-					if(terrainBaseType == terrainBaseType_gravel)
+					if(terrainBaseType == terrainBaseType_riverSand)
 					{
 						rangedFractionValue += 1.0;
 					}
