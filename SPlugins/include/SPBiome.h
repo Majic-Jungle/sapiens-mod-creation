@@ -17,7 +17,7 @@ struct SPBiomeThreadState;
 typedef struct SPSurfaceTypeDefault {
 	uint32_t materialIndex;
 	uint32_t decalGroupIndex;
-	float pathDifficultyMultiplier;
+	uint8_t pathDifficultyIndex;
 } SPSurfaceTypeDefault;
 
 typedef struct SPBiomeThreadState {
@@ -50,7 +50,7 @@ typedef struct SPSurfaceTypeResult {
 	uint16_t variationCount;
 	uint32_t materialIndex;
 	uint32_t decalTypeIndex;
-	float pathDifficultyMultiplier;
+	uint8_t pathDifficultyIndex;
 } SPSurfaceTypeResult;
 
 typedef struct SPTerrainVertModification {
