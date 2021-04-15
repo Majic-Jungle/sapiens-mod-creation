@@ -3,6 +3,10 @@
 #include "SPBiome.h"
 #include <string.h>
 
+// WARNING these variables are not thread local, but they should be. So any static storage here created on one thread may be overwritten with values from another thread, which can definitely cause problems.
+// typeMaps should generally be consistent between the server, the logic thread, and the main thread when the game is running. However they are not consistent between the globe view thread and the rest, so the globe thread must be finished with before the others are loaded.
+// possibly could use __declspec(thread) (MSVC) and __thread (for GNU), though not sure on macOS, maybe c11's thread_local
+
 static uint16_t biomeTag_hot;
 static uint16_t biomeTag_wet;
 static uint16_t biomeTag_dry;
