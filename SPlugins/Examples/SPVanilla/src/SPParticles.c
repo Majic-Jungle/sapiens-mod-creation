@@ -160,12 +160,12 @@ static const double cloudFieldSize = SP_METERS_TO_PRERENDER(400000.0);
 static const double cloudFieldHalfSize = SP_METERS_TO_PRERENDER(200000.0);
 
 static const int cumulusLargeGridCount = 16;
-static const double cumulusLargeAltitude = SP_METERS_TO_PRERENDER(1800.0);
+static const double cumulusLargeAltitude = SP_METERS_TO_PRERENDER(2400.0);
 static const double cumulusLargeScale = 4.0;
 
-static const int cumulusSmallGridCount = 128;
-static const double cumulusSmallAltitude = SP_METERS_TO_PRERENDER(800.0);
-static const double cumulusSmallScale = 0.6;
+static const int cumulusSmallGridCount = 64;
+static const double cumulusSmallAltitude = SP_METERS_TO_PRERENDER(600.0);
+static const double cumulusSmallScale = 1.2;
 
 static const int altoCloudGridCount = 48;
 static const double altoCloudAltitude = SP_METERS_TO_PRERENDER(6800.0);
@@ -462,7 +462,7 @@ bool spEmitterWasAdded(SPParticleThreadState* threadState,
 						state.p = spVec3Mul(posNormal, 1.0 + cumulusSmallAltitude);
 						state.particleTextureType = (counter % 16) + 12;
 						state.randomValueA = spRandGetValue(spRand);
-						state.scale = (randVec.z + 1.2) * cumulusSmallScale * (noiseValue + 1.0);
+						state.scale = (randVec.z + 1.2) * cumulusSmallScale * (noiseValue + 0.7);
 
 						state.v = spVec3Mul(cumulusSmallRight,cloudFieldSize);
 						state.userData.x = altitude;
