@@ -82,6 +82,7 @@ static uint32_t gameObjectType_gooseberryBush;
 static uint32_t gameObjectType_tallPine;
 static uint32_t gameObjectType_beetrootPlant;
 static uint32_t gameObjectType_wheatPlant;
+static uint32_t gameObjectType_bananaTree;
 
 static uint32_t gameObjectType_rock;
 static uint32_t gameObjectType_rockSmall;
@@ -177,6 +178,7 @@ void spBiomeInit(SPBiomeThreadState* threadState)
 		gameObjectType_orangeTree = threadState->getGameObjectTypeIndex(threadState, "orangeTree");
 		gameObjectType_peachTree = threadState->getGameObjectTypeIndex(threadState, "peachTree");
 		gameObjectType_aspen3 = threadState->getGameObjectTypeIndex(threadState, "aspen3");
+		gameObjectType_bananaTree = threadState->getGameObjectTypeIndex(threadState, "bananaTree");
 
 		gameObjectType_sunflower = threadState->getGameObjectTypeIndex(threadState, "sunflower");
 		gameObjectType_raspberryBush = threadState->getGameObjectTypeIndex(threadState, "raspberryBush");
@@ -341,6 +343,7 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 			tagsOut[tagCount++] = biomeTag_tropical;
 
 			float driestMonth = (float)spMin(rainfallSummer, rainfallWinter) / 6.0f;
+			double treeDensityOffset = 0.0;
 			if (driestMonth > 60.0f)
 			{
 				tagsOut[tagCount++] = biomeTag_rainforest;
@@ -352,6 +355,28 @@ void spBiomeGetTagsForPoint(SPBiomeThreadState* threadState,
 			else
 			{
 				tagsOut[tagCount++] = biomeTag_savanna;
+				treeDensityOffset = - 0.4;
+			}
+
+			double noiseValue = getSoilRichnessNoiseValue(threadState, noiseLoc, steepness, riverDistance) + treeDensityOffset;
+			if(noiseValue > -0.2)
+			{
+				if(noiseValue > 0.7)
+				{
+					tagsOut[tagCount++] = biomeTag_denseForest;
+				}
+				else if(noiseValue > 0.4)
+				{
+					tagsOut[tagCount++] = biomeTag_mediumForest;
+				}
+				else
+				{
+					tagsOut[tagCount++] = biomeTag_sparseForest;
+				}
+			}
+			else
+			{
+				tagsOut[tagCount++] = biomeTag_verySparseForest;
 			}
 		}
 		else
@@ -939,6 +964,7 @@ typedef struct ForestInfo {
 	bool birch;
 	bool cold;
 	bool river;
+	bool tropical;
 
 } ForestInfo;
 
@@ -985,6 +1011,10 @@ void getForestInfo(uint16_t* biomeTags,
 		{
 			forestInfo->birch = true;
 		}
+		else if(biomeTags[i] == biomeTag_tropical)
+		{
+			forestInfo->tropical = true;
+		}
 		else if(biomeTags[i] == biomeTag_polar ||
 			biomeTags[i] == biomeTag_veryColdWinter)
 		{
@@ -1021,6 +1051,7 @@ uint32_t getWillowType(uint64_t faceUniqueID, int i)
 
 uint32_t getTreeType(uint64_t faceUniqueID, int i, ForestInfo* forestInfo)
 {
+
 	if(forestInfo->river)
 	{
 		if(spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 342573 + i, 2) == 1)
@@ -1139,10 +1170,17 @@ int spBiomeGetTransientGameObjectTypesForFaceSubdivision(SPBiomeThreadState* thr
 
 						if(noiseValue > 0.3)
 						{
+							uint32_t treeObjectType = gameObjectType_appleTree;
+
+							if(forestInfo.tropical)
+							{
+								treeObjectType = gameObjectType_bananaTree;
+							}
 							int objectCount = spRandomIntegerValueForUniqueIDAndSeed(faceUniqueID, 9235, 16) - 12;
 							for(int i = 0; i < objectCount; i++)
 							{
-								ADD_OBJECT(gameObjectType_appleTree);
+
+								ADD_OBJECT(treeObjectType);
 							}
 						}
 						else if(noiseValue < -0.3)
