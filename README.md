@@ -7,7 +7,7 @@ The tools and this readme are an extremely early work in progress, the game isn'
 
 # Overview
 
-Sapiens is designed with modding in mind, to the extent that a mod could actually create a whole different kind of game. Nearly half of the game's code is written in Lua, and pretty much all of that code can be overridden. All of the game's shaders, images, models, sounds, and fonts can also be replaced or added to, and there is also a C based plugin system  to allow even more flexibility where performance matters in areas like terrain generation, biome assignment, and the particle engine.
+Sapiens is designed with modding in mind, to the extent that a mod could actually create a whole different kind of game. Nearly half of the game's code is written in Lua, and pretty much all of that code can be overridden. All of the game's shaders, images, models, sounds, and fonts can also be replaced or added to, and there is also a C based plugin system  to allow even more flexibility where performance matters in areas like terrain generation, biome assignment, and the particle engine. 
 
 # Lua
 
