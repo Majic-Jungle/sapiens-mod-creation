@@ -1,0 +1,3 @@
+[submodule "splugins"]
+	path = splugins
+	url = https://github.com/Majic-Jungle/splugins
