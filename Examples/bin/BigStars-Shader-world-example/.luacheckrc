@@ -40,6 +40,8 @@ globals = {
     "ModelImageView",
     "GlobeView",
     "RenderTargetView",
+    "LinesView",
+    "TerrainMapView",
 
     "Font",
 
@@ -64,7 +66,11 @@ globals = {
     "setSunset",
     "printType",
     "tp",
+    "logDebug",
     "spawn",
+    "setDebugObject",
+    "completeCheat",
+    "debugLog",
     --end
 }
 

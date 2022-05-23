@@ -1,6 +1,6 @@
 local modInfo = {
     name = "Resource Override Example",
-    description = "This example mod replaces various resources with example custom ones. Replaces:\n - Rock model file\n - UI button click up sound\n - Console font",
+    description = "This example mod replaces various resources with example custom ones. Replaces:\n - Rock model with a direct override\n - Limestone rock with a new model, assigned in a script\n - UI button click up sound\n - Console font",
     preview = "preview.jpg",
     version = "0.0.1",
     type = "world",

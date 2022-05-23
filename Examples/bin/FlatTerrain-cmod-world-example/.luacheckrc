@@ -21,23 +21,14 @@ globals = {
     "MeshTypeTerrain",
     "MeshTypeGameObject",
 
-    "PHYSICS_TYPE_NONE",
-    "PHYSICS_TYPE_STATIC_MESH",
-    "PHYSICS_TYPE_STATIC_BOX",
-    "PHYSICS_TYPE_DYNAMIC_BOX",
-    "PHYSICS_TYPE_STATIC_MODEL_COLLIDERS",
     "RENDER_TYPE_NONE",
     "RENDER_TYPE_STATIC",
     "RENDER_TYPE_STATIC_TRANSPARENT_BUILD",
     "RENDER_TYPE_DYNAMIC",
 
-    "VEGETATION_STATE_DEFAULT",
-    "VEGETATION_STATE_ALL_STRIPPED",
-
     "GameStateMainMenu",
     "GameStateLoading",
     "GameStateLoadedRunning",
-    "GameStateLoadedPaused",
 
     "View",
     "ColorView",
@@ -48,6 +39,9 @@ globals = {
     "ModelTextView",
     "ModelImageView",
     "GlobeView",
+    "RenderTargetView",
+    "LinesView",
+    "TerrainMapView",
 
     "Font",
 
@@ -70,6 +64,13 @@ globals = {
     "logPlayer",
     "setSunrise",
     "setSunset",
+    "printType",
+    "tp",
+    "logDebug",
+    "spawn",
+    "setDebugObject",
+    "completeCheat",
+    "debugLog",
     --end
 }
 
