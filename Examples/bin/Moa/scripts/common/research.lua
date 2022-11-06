@@ -20,6 +20,7 @@ function mod:onload(research)
 
         research.types.campfireCooking.constructableTypeIndexesByBaseResourceTypeIndex[resource.types.moaMeat.index] = constructable.types.cookedMoa.index
         table.insert(research.types.campfireCooking.resourceTypeIndexes, resource.types.moaMeat.index)
+        research:updateDerivedInfo(research.types.campfireCooking)
     end
 end
 

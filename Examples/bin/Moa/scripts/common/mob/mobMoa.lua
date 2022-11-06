@@ -13,30 +13,31 @@ function mobMoa:load(mob, gameObject)
         
         deadObjectTypeIndex = gameObject.typeIndexMap.deadMoa,
 
-        initialHealth = 0.4,
-        spawnFrequency = 1.0,
-        spawnDistance = mj:mToP(200.0),
+        initialHealth = 7.9,
+        spawnFrequency = 1.0, --todo
+        spawnDistance = mj:mToP(600.0), --heard will spawn approx this distance away from some sapien, then walk moderately close, pass by and despawn this same distance further on
         
         reactDistance = mj:mToP(50.0),
-        agroDistance = mj:mToP(1.0),
         runDistance = mj:mToP(15.0),
+        agroDistance = mj:mToP(1.0),
+        attackDistance = mj:mToP(2.0), --the existence of this is also used to determine if mob is hostile
 
         agroTimerDuration = 3.0,
-        aggresionLevel = nil,
+        aggresionLevel = 1, -- nil or 0 will always run away from moderately close sapiens. 1 will hold ground sometimes, and also charge at the sapien when agro.
 
-        pathFindingRayRadius = mj:mToP(0.2),
-        pathFindingRayYOffset = mj:mToP(0.2),
+        pathFindingRayRadius = mj:mToP(1.0),
+        pathFindingRayYOffset = mj:mToP(2.0),
         walkSpeed = mj:mToP(2.5),
         runSpeedMultiplier = 4.0,
-        embedBoxHalfSize = vec3(0.1,0.1,0.1),
+        embedBoxHalfSize = vec3(0.5,1.0,0.5),
         
         maxSoundDistance2 = mj:mToP(100.0) * mj:mToP(100.0),
         soundVolume = 0.4,
-        soundRandomBaseName = "chicken",
-        soundRandomBaseCount = 4,
-        soundAngryBaseName = "chickenAngry",
+        soundRandomBaseName = "moa",
+        soundRandomBaseCount = 3,
+        soundAngryBaseName = "moaAngry",
         soundAngryBaseCount = 1,
-        deathSound = "chickenDie",
+        deathSound = "moaAngry1",
         
         animationGroupIndex = animationGroups.moa.index,
         idleAnimations = {
@@ -52,6 +53,8 @@ function mobMoa:load(mob, gameObject)
         
         runAnimation = "run",
         deathAnimation = "die",
+
+        agroWalkAnimation = "run",
         
         addGameObjectInfo = {
             name = locale:get("mob_moa"),
@@ -64,7 +67,7 @@ function mobMoa:load(mob, gameObject)
 			ignoreBuildRay = true,
             markerPositions = {
                 { 
-                    worldOffset = vec3(0.0, mj:mToP(0.8), 0.0)
+                    worldOffset = vec3(0.0, mj:mToP(2.8), 0.0)
                 }
             },
         },

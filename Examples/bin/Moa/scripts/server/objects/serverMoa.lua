@@ -30,7 +30,7 @@ function serverMoa:init(serverGOM_, serverWorld_, serverMob_)
     
     local reactDistance = mob.types.chicken.reactDistance
     
-    serverGOM:setInfrequentCallbackForGameObjectsInSet(serverGOM.objectSets.moas, "update", 5.0, infrequentUpdate)-- this needs to be called frequently enough for the walk speed to only cover 4.5 meters, or mob will pause every update. Max of 4.5/speed
+    serverGOM:setInfrequentCallbackForGameObjectsInSet(serverGOM.objectSets.moas, "update", 2.0, infrequentUpdate)-- this needs to be called frequently enough for the walk speed to only cover 4.5 meters, or mob will pause every update. Max of 4.5/speed
     serverGOM:addProximityCallbackForGameObjectsInSet(serverGOM.objectSets.moas, serverGOM.objectSets.sapiens, reactDistance, mobSapienProximity)
 end
 

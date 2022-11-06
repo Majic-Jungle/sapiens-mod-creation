@@ -9,6 +9,7 @@ local animations = mj:enum {
     "run",
     "die",
     "dead",
+    "attack",
 }
 
 animations.uiAnimation = animations.stand1
