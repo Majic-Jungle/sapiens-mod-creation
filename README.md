@@ -39,6 +39,6 @@ Example VS2017 solutions are provided to compile mods for Windows, and the same 
 
 # More Information
 
-[Official Sapiens Documentation Wiki](https://github.com/mjdave/sapiens-mod-creation/wiki)
-[Unofficial Sapiens Modding Wiki](https://wiki.sapiens.dev/)
-[Sapiens Discord](https://discord.gg/VAkYw2r)
+- [Official Sapiens Documentation Wiki](https://github.com/mjdave/sapiens-mod-creation/wiki)
+- [Unofficial Sapiens Modding Wiki](https://wiki.sapiens.dev/)
+- [Sapiens Discord](https://discord.gg/VAkYw2r)
