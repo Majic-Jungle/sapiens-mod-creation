@@ -1,17 +1,13 @@
 # Sapiens Mod Creation Tools
-This is the official tools and examples for mod creation in the upcoming game [Sapiens](https://playsapiens.com)
-
-The [Documentation Wiki](https://github.com/mjdave/sapiens-mod-creation/wiki) is a WIP, slowly being worked on and added to, but is worth a look through also.
-
-The tools and this readme are an extremely early work in progress, the game isn't out yet, and there is no way to test any created mods without the game. So for now, you can have a look around, maybe try to compile a C mod, and let me (Dave) know on the [Sapiens Discord](https://discord.gg/VAkYw2r) if you have any problems.
+This is the official tools and examples for mod creation in [Sapiens](https://playsapiens.com)
 
 # Overview
 
-Sapiens is designed with modding in mind, to the extent that a mod could actually create a whole different kind of game. Nearly half of the game's code is written in Lua, and pretty much all of that code can be overridden. All of the game's shaders, images, models, sounds, and fonts can also be replaced or added to, and there is also a C based plugin system  to allow even more flexibility where performance matters in areas like terrain generation, biome assignment, and the particle engine. 
+Sapiens is designed with modding in mind, to the extent that a mod could actually create a whole different kind of game. Over half of the game's code is written in Lua, and pretty much all of that code can be overridden. All of the game's shaders, images, models, sounds, and fonts can also be replaced or added to, and there is also a C based plugin system  to allow even more flexibility where performance matters in areas like terrain generation, biome assignment, and the particle engine. 
 
 # Lua
 
-Mods that wish to override or add Lua code can do so by creating their lua files in a directory structure that mirrors the game's scripts directory. More documentation will be added on this later, but for now you can have a look at the scripts directory in the BlueUI-Lua-app-example.
+Mods that wish to override or add Lua code can do so by creating their lua files in a directory structure that mirrors the game's scripts directory. More documentation will be added on this later, but for now, look at the scripts directory in the example mods.
 
 All you need to do is place the lua scripts in the right place, and they will get loaded. The vanilla lua code is always loaded first, and then the mod files are loaded, and mod:onload() is called, passing the vanilla module as an argument. This allows the mod to replace any data and/or functions of the vanilla object.
 
@@ -43,4 +39,6 @@ Example VS2017 solutions are provided to compile mods for Windows, and the same 
 
 # More Information
 
-Please have a look at the [Sapiens Documentation Wiki](https://github.com/mjdave/sapiens-mod-creation/wiki), join the [Sapiens forums](https://forums.playsapiens.com/), or come and chat on the [Sapiens Discord](https://discord.gg/VAkYw2r).
+- [Official Sapiens Documentation Wiki](https://github.com/mjdave/sapiens-mod-creation/wiki)
+- [Unofficial Sapiens Modding Wiki](https://wiki.sapiens.dev/)
+- [Sapiens Discord](https://discord.gg/VAkYw2r)
