@@ -3,7 +3,6 @@ local vec3 = mjm.vec3
 local normalize = mjm.normalize
 local vec3xMat3 = mjm.vec3xMat3
 local dot = mjm.dot
---local mat3Rotate = mjm.mat3Rotate
 local mat3LookAtInverse = mjm.mat3LookAtInverse
 local mat3GetRow = mjm.mat3GetRow
 local mat3Inverse = mjm.mat3Inverse

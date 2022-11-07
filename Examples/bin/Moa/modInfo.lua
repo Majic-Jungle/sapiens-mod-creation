@@ -1,8 +1,8 @@
 local modInfo = {
     name = "Moa",
-    description = "This is an official mod made by the developer, to test and show how to add a mob to the game",
+    description = "This is an official mod made by the developer, to show how to add a new mob type to the game. It's fully functional, and will be kept up to date.",
     preview = "preview.jpg",
-    version = "0.0.1",
+    version = "0.9.0",
     type = "world",
     developer = "Majic Jungle",
     website = "https://majicjungle.com",

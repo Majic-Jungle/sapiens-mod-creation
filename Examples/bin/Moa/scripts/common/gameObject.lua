@@ -38,6 +38,9 @@ function mod:onload(gameObject)
                     worldOffset = vec3(0.0, mj:mToP(0.3), 0.0)
                 }
             },
+            eatByProducts = {
+                gameObject.typeIndexMap.bone,
+            },
         },
         
         moaMeatLeg = {
@@ -51,6 +54,9 @@ function mod:onload(gameObject)
                 { 
                     worldOffset = vec3(0.0, mj:mToP(0.3), 0.0)
                 }
+            },
+            eatByProducts = {
+                gameObject.typeIndexMap.bone,
             },
         },
         
@@ -66,6 +72,9 @@ function mod:onload(gameObject)
                     worldOffset = vec3(0.0, mj:mToP(0.3), 0.0)
                 }
             },
+            eatByProducts = {
+                gameObject.typeIndexMap.bone,
+            },
         },
         
         moaMeatLegCooked = {
@@ -79,6 +88,9 @@ function mod:onload(gameObject)
                 { 
                     worldOffset = vec3(0.0, mj:mToP(0.3), 0.0)
                 }
+            },
+            eatByProducts = {
+                gameObject.typeIndexMap.bone,
             },
         },
 

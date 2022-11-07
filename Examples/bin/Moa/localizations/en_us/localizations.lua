@@ -13,7 +13,7 @@ localizations.values = {
     object_moaMeat_plural = "Raw Moa Meat",
     object_moaMeatCooked = "Cooked Moa Meat",
     object_moaMeatCooked_plural = "Cooked Moa Meat",
-    
+
     resource_moaMeat = "Raw Moa Meat",
     resource_moaMeat_plural = "Raw Moa Meat",
     resource_moaMeatCooked = "Cooked Moa Meat",

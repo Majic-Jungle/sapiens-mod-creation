@@ -1,4 +1,5 @@
-
+-- This file is a stub, which could allow for different behaviors per mob type. It is currently necessary to provide these functions here, as the vanilla code expects them.
+-- Currently though, none of the mobs use this to override the base clientMob functionality.
 
 local clientMoa = {}
 

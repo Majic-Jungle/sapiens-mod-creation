@@ -1,8 +1,5 @@
 local mjm = mjrequire "common/mjm"
 local vec3 = mjm.vec3
---local tool = mjrequire "common/tool"
---local plan = mjrequire "common/plan"
---local skill = mjrequire "common/skill"
 local locale = mjrequire "common/locale"
 local animationGroups = mjrequire "common/animations/animationGroups"
 
@@ -14,7 +11,7 @@ function mobMoa:load(mob, gameObject)
         deadObjectTypeIndex = gameObject.typeIndexMap.deadMoa,
 
         initialHealth = 7.9,
-        spawnFrequency = 1.0, --todo
+        spawnFrequency = 0.5,
         spawnDistance = mj:mToP(600.0), --heard will spawn approx this distance away from some sapien, then walk moderately close, pass by and despawn this same distance further on
         
         reactDistance = mj:mToP(50.0),
