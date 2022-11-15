@@ -10,7 +10,20 @@ function mod:onload(inspectCraftPanel)
     
     local prevLoad = inspectCraftPanel.load
     inspectCraftPanel.load = function(inspectCraftPanel_, serinspectUI_, inspectObjectUI_, world_, parentContainerView)
-        table.insert(inspectCraftPanel.itemLists[gameObject.typeIndexMap.campfire], 2, constructable.types.cookedMoa.index)
+
+        local function insertAfter(addType, afterType, list)
+            local afterFoundIndex = nil
+            for i,otherType in ipairs(list) do
+                if otherType == afterType then
+                    afterFoundIndex = i
+                    break
+                end
+            end
+            table.insert(list, afterFoundIndex or #list, addType)
+        end
+
+        insertAfter(constructable.types.cookedMoa.index, constructable.types.cookedAlpaca.index, inspectCraftPanel.itemLists[gameObject.typeIndexMap.campfire])
+
         prevLoad(inspectCraftPanel_, serinspectUI_, inspectObjectUI_, world_, parentContainerView)
     end
 end
