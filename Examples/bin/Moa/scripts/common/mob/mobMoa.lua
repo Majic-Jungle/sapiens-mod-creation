@@ -36,6 +36,9 @@ function mobMoa:load(mob, gameObject)
         soundAngryBaseCount = 1,
         deathSound = "moaAngry1",
         
+        pooFrequencyDays = 1,
+        pooQuantity = 1,
+        
         animationGroupIndex = animationGroups.moa.index,
         idleAnimations = {
             "stand1", 
