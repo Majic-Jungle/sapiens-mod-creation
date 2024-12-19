@@ -3,7 +3,7 @@ local mod = {
 }
 
 function mod:onload(animationGroups)
-    table.insert(animationGroups.groupNames, "moa")
+    table.insert(animationGroups.loadFileNames, "moa")
 end
 
 return mod

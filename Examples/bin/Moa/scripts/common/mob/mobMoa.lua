@@ -1,7 +1,6 @@
 local mjm = mjrequire "common/mjm"
 local vec3 = mjm.vec3
 local locale = mjrequire "common/locale"
-local animationGroups = mjrequire "common/animations/animationGroups"
 
 local mobMoa = {}
 
@@ -11,8 +10,9 @@ function mobMoa:load(mob, gameObject)
         deadObjectTypeIndex = gameObject.typeIndexMap.deadMoa,
 
         initialHealth = 7.9,
-        spawnFrequency = 0.5,
+        spawnFrequency = 0.4,
         spawnDistance = mj:mToP(600.0), --heard will spawn approx this distance away from some sapien, then walk moderately close, pass by and despawn this same distance further on
+        minSapienProximityDistanceForSpawning = mj:mToP(50.0),
         
         reactDistance = mj:mToP(50.0),
         runDistance = mj:mToP(15.0),
@@ -24,8 +24,9 @@ function mobMoa:load(mob, gameObject)
 
         pathFindingRayRadius = mj:mToP(1.0),
         pathFindingRayYOffset = mj:mToP(2.0),
-        walkSpeed = mj:mToP(2.5),
+        walkSpeed = mj:mToP(1.5),
         runSpeedMultiplier = 4.0,
+        rotationSpeedMultiplier = 1.5,
         embedBoxHalfSize = vec3(0.5,1.0,0.5),
         
         maxSoundDistance2 = mj:mToP(100.0) * mj:mToP(100.0),
@@ -39,12 +40,21 @@ function mobMoa:load(mob, gameObject)
         pooFrequencyDays = 1,
         pooQuantity = 1,
         
-        animationGroupIndex = animationGroups.moa.index,
+        maxHunterAssignCount = 5,
+        
+        animationGroup = "moa",
         idleAnimations = {
             "stand1", 
-            "peckRight",
-            "peckLeft",
-            "peckRandom",
+            --"peckRight",
+            --"peckLeft",
+            --"peckRandom",
+        },
+
+        agroIdleAnimations = {
+            "stand1",
+            --"stand2",
+            --"stand3",
+            --"stand4",
         },
 
         sleepAnimations = {
